@@ -3,12 +3,10 @@ import sys
 import subprocess
 
 def replace_markdown_links_in_file(content):
-    # pattern_inline_link = re.compile(r'\[([^\]]+?)\]\((.+?)\)')
     pattern_image_link = re.compile(r'!\[([^\]]+?)\]\((.+?)\)')
     pattern_new_link = re.compile(r'~\[([^\]]+?)\]\((.+?)\)')
     content = pattern_new_link.sub(r'<a href="\2" target="_blank">\1</a>', content)
     content = pattern_image_link.sub(r'<a href="\2" target="_blank"><img src="\2" alt="\1" style="max-width:300px;max-height:300px;"></a>', content)
-    # content = pattern_inline_link.sub(r'<a href="\2">\1</a>', content)
     return content
 
 template = """
@@ -65,8 +63,6 @@ if __name__ == "__main__":
     input_file = sys.argv[1]
     with open(input_file, 'r', encoding='utf-8') as f:
         content = f.read()
-    # content = content.replace('<', '&lt;')
-    # content = content.replace('>', '&gt;')
     content = replace_markdown_links_in_file(content)
     title = content.splitlines(1)[0].strip()
     body = ''.join(content.splitlines(1)[2:])
