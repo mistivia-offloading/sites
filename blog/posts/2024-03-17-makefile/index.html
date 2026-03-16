@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>一些编写Makefile的常用套路</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// 一些编写Makefile的常用套路
+#import &quot;/template.typ&quot;:*
+#doc-template(
+title: &quot;一些编写Makefile的常用套路&quot;,
+date: &quot;2024年3月17日&quot;,
+body: [
+
+列出`src`目录中的所有的`*.c`文件：
+
+```
+SRC = $(shell find src/ -name &#x27;*.c&#x27;)
+```
+
+列出`src`目录中的所有`*.c`文件，但是不包括`main.c`:
+
+```
+SRC = $(shell find src/ -name &#x27;*.c&#x27; -not -name &#x27;main.c&#x27;)
+```
+
+列出所有`*.c`文件对应的`*.o`文件：
+
+```
+OBJ = $(SRC:.c=.o)
+```
+
+把所有`*.c`文件编译成`*.o`文件并生成头文件的依赖关系（`*.d`文件）：
+
+```
+$(OBJ):%.o:%.c
+    $(CC) -c $(CFLAGS) $&lt; -MD -MF $@.d -o $@
+```
+
+把依赖关系加入到`Makefile`中，以便于头文件有修改时自动重新编译：
+
+```
+DEPS := $(shell find . -name *.d)
+
+ifneq ($(DEPS),)
+include $(DEPS)
+endif
+```
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/posts/2024-03-17-makefile/index.pdf">
+        <p><a href="/posts/2024-03-17-makefile/index.pdf">/posts/2024-03-17-makefile/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

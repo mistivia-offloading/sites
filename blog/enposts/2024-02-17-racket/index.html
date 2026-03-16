@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Successfully Getting Started with Racket</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Successfully Getting Started with Racket
+#import &quot;/template-en.typ&quot;:*
+#doc-template(
+title: &quot;Successfully Getting Started with Racket&quot;,
+date: &quot;February 17, 2024&quot;,
+body: [
+
+During the Spring Festival, I had nothing to do at home, so I used Racket to solve several problems on #link(&quot;https://adventofcode.com/2023&quot;)[Advent of Code 2023]. My previous attempts at learning Scheme-like languages were not very smooth and I faced many setbacks. However, this time it went very smoothly. I suddenly felt comfortable writing code, and I even learned how to write hygienic macros. Maybe I suddenly had an epiphany.
+
+Initially, I wanted to use C to solve these problems. But sure enough, as the problems became increasingly complex, using C to write these things started to feel a bit taxing on my sanity, especially string processing, which is what C is least good at.
+
+Compared to C, Racket is much more relaxed. At least you don&#x27;t have to spend half a day flipping through documentation for a function that converts a string to a number. At the same time, the simplicity of Racket, or Scheme, is comparable to C. In terms of the number of pages in the standard documentation, ISO C is about 200 pages, while R5RS is only over 50 pages. Even the R6RS, which is widely criticized for being &quot;too complex,&quot; is only over 100 pages. Racket is a &quot;batteries-included&quot; variant of Scheme with very powerful features, but the core of the language still maintains the tradition of Scheme and is very refined. I have a R5RS cheat sheet on my desk that is only half a page long, which is enough to handle most daily functional needs.
+
+&quot;The Zen of Python&quot; mentions:
+
+#myquote([
+  Explicit is better than implicit. 
+  Simple is better than complex.
+])
+
+However, it is clear that today&#x27;s Python has not achieved this; instead, it has gone in the opposite direction. I have never understood Python&#x27;s Metaclass, and there are various subtle pitfalls in OOP that make me tremble with fear. Coupled with new features like gradual typing and await/async, I no longer dare to say I know how to write Python. JavaScript has similar problems. As for C++, let&#x27;s not even mention it. Racket originated in academia and also pursues new functions and features, but the core part of the language is stable. When using Racket, you can choose to use only the core part similar to R5RS, or you can use the huge standard library and complex features like contracts and Typed Racket.
+
+It&#x27;s not that I can&#x27;t adapt to complex syntax. I even used to be very interested in being a C++ language lawyer. However, these things are gradually forgotten if they are not used for a long time, and it takes a lot of effort to pick them up again, like Sisyphus. Life is short, and now I am more unwilling to waste my precious time on these obscure and useless details.
+
+The performance of Racket is also good. Although it naturally cannot compare with the likes of C/C++, Rust, it is roughly in the same tier as Java and Node.js (and sometimes slightly slower), but it is much stronger than scripting languages like Python and Ruby. This probably has something to do with the Racket on Chez Scheme work in recent years.
+
+The last advantage is probably that Racket is very suitable for developing &quot;cold-blooded software.&quot; This concept was proposed in #link(&quot;https://dubroy.com/blog/cold-blooded-software/&quot;)[this blog]. Here, &quot;cold-blooded&quot; does not mean the cold-bloodedness of a &quot;cold-blooded killer,&quot; but the cold-bloodedness of a &quot;cold-blooded animal,&quot; which roughly means it can hibernate and still be picked up many years later. It won&#x27;t be like after a few years, the API and SDK have changed drastically, and even the development environment cannot be configured (this is very common in languages like Python and JavaScript; the messy dependencies and build systems of C++ also lead to similar problems). But I have reason to believe that Racket is unlikely to have similar phenomena because the language core is very refined. I remember that I once downloaded the code for a Scheme interpreter from the 1980s. At that time, there was not even an ISO C standard, but this code could be successfully compiled and executed on a modern Linux system with minor modifications, which left a deep impression on me.
+
+These are my thoughts on successfully getting started with Racket recently. I have some side project ideas recently and plan to try them with Racket.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2024-02-17-racket/index.pdf">
+        <p><a href="/enposts/2024-02-17-racket/index.pdf">/enposts/2024-02-17-racket/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

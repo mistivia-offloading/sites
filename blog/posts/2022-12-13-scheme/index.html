@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>邪道Scheme</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// 邪道Scheme
+#import &quot;/template.typ&quot;:doc-template
+
+#doc-template(
+title: &quot;邪道Scheme&quot;,
+date: &quot;2022年12月13日&quot;,
+body: [
+
+因为Scheme和Lisp系的其他语言一样，过于灵活，因此可以往语言里面加入很多奇怪的东西。甚至，如果想用命令式的方式，像Python一样编写Scheme代码，也是可以的。
+
+这篇文章中的代码都是为GNU Guile和TinyScheme而写的，这两个解释器都支持老式的Lisp宏。这种宏在Common Lisp当中更多见，并不卫生，也不属于任何Scheme标准。但是大多数解释器和编译器都支持。
+
+例如，假如想在Racket中运行，只需要在代码前面加入下面这段语法就可以了：
+
+```
+#lang racket
+
+(define-syntax define-macro
+  (lambda (x)
+    (syntax-case x ()
+      ((_ (macro . args) body ...)
+       #&#x27;(define-macro macro (lambda args body ...)))
+      ((_ macro transformer)
+       #&#x27;(define-syntax macro
+           (lambda (y)
+             (syntax-case y ()
+               ((_ . args)
+                (let ((v (syntax-&gt;datum #&#x27;args)))
+                  (datum-&gt;syntax y (apply transformer v)))))))))))
+```
+
+= hello, world
+
+Python代码：
+
+```
+print(&quot;hello, world&quot;)
+```
+
+函数定义：
+
+```
+(define println
+    (lambda x
+      (apply display x)
+      (newline)))
+```
+
+最终效果：
+
+```
+(println &quot;hello world&quot;)
+```
+
+= Def
+
+Python代码：
+
+```
+def is_even(x):
+    if x % 2 == 0:
+        return True
+    return False
+```
+
+宏定义：
+
+```
+(define-macro (def form . body)
+    `(define ,form
+         (call/cc (lambda (return)
+            ,@body))))
+```
+
+最终效果：
+
+```
+(def (is-even x)
+    (cond ((= 0 (modulo x 2))
+        (return #t)))
+    (return #f))
+```
+
+
+= While
+
+Python代码：
+
+```
+i = 0
+while True:
+    i = i + 1
+    if x % 2 == 0:
+        continue
+    print(i)
+    if i &gt; 10:
+        break
+```
+
+
+宏定义：
+
+```
+(define-macro (while condition . body)
+    (let ((loop (gensym)))
+        `(call/cc (lambda (break)
+            (letrec ((,loop (lambda ()
+                (cond (,condition
+                    (call/cc (lambda (continue)
+                            ,@body))
+                    (,loop))))))
+                (,loop))))))
+```
+
+
+最终效果：
+
+```
+(let ((i 0))
+(while #t
+    (set! i (+ i 1))
+    (cond ((= (modulo i 2) 0)
+         (continue)))
+    (cond ((&gt; i 10)
+        (break)))
+    (println i)))
+```
+
+
+= For
+
+Python代码：
+
+```
+for i in range(0, 10):
+    print(i)
+```
+
+
+宏和工具函数定义：
+
+```
+(define (iter-get iter)
+    (cond ((list? iter)
+        (car iter))
+    (else
+        (iter &#x27;get))))
+
+(define (iter-next iter)
+    (cond ((list? iter)
+        (cdr iter))
+    (else
+        (iter &#x27;next))))
+
+(define (range start end)
+    (lambda (method)
+        (cond ((eq? &#x27;get method)
+            (if (&gt;= start end)
+                &#x27;()
+                start))
+        ((eq? &#x27;next method)
+            (range (+ 1 start) end)))))
+
+(define-macro (for i range . body)
+    (let ((loop (gensym))
+          (iter (gensym)))
+    `(call/cc (lambda (break)
+        (letrec
+            ((,loop (lambda (,iter)
+                (if (eq? (iter-get ,iter) &#x27;())
+                    &#x27;()
+                    (let ((,i (iter-get ,iter)))
+                          (call/cc (lambda (continue)
+                             ,@body))
+                          (,loop (iter-next ,iter)))))))
+            (,loop ,range))))))
+```
+
+
+最终效果：
+
+```
+(for i (range 0 10)
+    (println i))
+```
+
+
+= Goto
+
+这个还是算了吧！
+
+= Fizz Buzz!
+
+Python写出来是这样：
+
+```
+for i in range(35):
+    if i % 15 == 0:
+        print(&quot;FizzBuzz&quot;)
+        continue
+    if i % 3 == 0:
+        print(&quot;Fizz&quot;)
+        continue
+    if i % 5 == 0:
+        print(&quot;Buzz&quot;)
+        continue
+    print(i)
+```
+
+用Scheme的话，加上上面的宏，几乎可以一一对应：
+
+```
+(for i (range 1 35)
+    (cond ((= 0 (modulo i 15))
+        (println &quot;FizzBuzz&quot;)
+        (continue)))
+    (cond ((= 0 (modulo i 3))
+        (println &quot;Fizz&quot;)
+        (continue)))
+    (cond ((= 0 (modulo i 5))
+        (println &quot;Buzz&quot;)
+        (continue)))
+    (println i))
+```
+
+]
+)</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/posts/2022-12-13-scheme/index.pdf">
+        <p><a href="/posts/2022-12-13-scheme/index.pdf">/posts/2022-12-13-scheme/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

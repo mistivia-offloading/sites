@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Just a Food Gatherer</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Just a Food Gatherer
+#import &quot;/template-en.typ&quot;: doc-template
+
+#doc-template(
+title: &quot;Just a Food Gatherer&quot;,
+date: &quot;April 12, 2018&quot;,
+body: [
+
+&quot;Sapiens: A Brief History of Humankind&quot; is a very interesting book. There are many popular science books about human history, &quot;A Global History&quot; being one example, but &quot;Sapiens&quot; has a very unique aspect: it focuses on telling the story of &quot;what humans are&quot; from a biological perspective.
+
+Biologically, Homo sapiens still retains the habits of a food gatherer. It has only been hundreds of thousands of years since Homo sapiens walked out of Africa. In the history of biological evolution, this is far too short to change our nature. Perhaps this explains why I wear glasses; I wasn&#x27;t born to sit in front of a screen typing, yet this is about to become my means of livelihood. At the same time, the &quot;food gatherer&quot; explanation also sheds light on why &quot;The Legend of Zelda: Breath of the Wild&quot; is so addictive. I&#x27;ve seen many explanations, some mentioning &quot;flow,&quot; others &quot;gameplay.&quot; These are all part of the reason, but nature also plays a crucial role. When I wander through Hyrule, seeing shiny apples and mushrooms, a certain segment of DNA in my blood, with a history of hundreds of thousands of years, simply wakes up.
+
+Homo sapiens is also good at imagining things that don&#x27;t exist. A recent example is Bitcoin. Bitcoin is just a string of numbers with no value in itself. When mining machines speed through calculations with whirring fans next to hydroelectric power stations, the data input is just a string of garbled code. As the saying goes, &quot;Garbage in, garbage out,&quot; so the data they output is naturally garbled too. But even with such a string of garbled code, some people treat it as a treasure. Some might find this absurd, but actually, it&#x27;s not that absurd. Religion, corporations, money, etc., are all products of our imagination. Precisely because they are not written in our DNA and do not actually exist, it&#x27;s not surprising how they change. Neanderthals, who lacked this imaginative capacity, were beaten to death with clubs by our ancestors and disappeared into the long river of history; we naturally don&#x27;t want to be like them.
+
+Finally, technological progress does not necessarily lead to happiness. The emergence of agriculture not only degraded the quality of life for Homo sapiens but also enslaved hundreds of millions of animals. Although industrialization brought some improvement, people living in reinforced concrete still envy the pastoral idyll. Some people once felt that high-speed rail was too fast and that we should &quot;wait for the soul&quot;; the same logic should apply here. But now, with the technological explosion, it&#x27;s probably unrealistic to ask it to &quot;wait for the DNA.&quot; Increasingly complex technology is overwhelming and worrying. For example, almost no one can understand what the hundreds of millions of transistors inside the mobile phones and computers they use daily are actually doing. This can bring panic, which, when reflected in culture, gives rise to &quot;cyberpunk.&quot; However, the new generation seems to have already begun treating the internet and computers as water and air; &quot;cyberpunk&quot; might eventually go out of style.
+
+So, Homo sapiens is really too small. If the author had read the &quot;Tao Te Ching,&quot; he might have quoted this line: &quot;Heaven and earth are heartless; they treat the myriad creatures as straw dogs.&quot; Therefore, thinking about the meaning of life can cause a headache; to be able to eat well, sleep well, and read some books is already very happy.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2018-04-12-human/index.pdf">
+        <p><a href="/enposts/2018-04-12-human/index.pdf">/enposts/2018-04-12-human/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

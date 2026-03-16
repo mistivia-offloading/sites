@@ -1,1 +1,8 @@
 blog/pdfjs/
+*.pdf
+.bashrc
+.inputrc
+.Xauthority
+index.log
+templates/*.log
+scripts/__pycache__/

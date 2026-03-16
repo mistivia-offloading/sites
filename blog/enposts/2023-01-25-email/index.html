@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Email Workflow</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// My Email Workflow
+#import &quot;/template-en.typ&quot;: *
+
+#doc-template(
+title: &quot;My Email Workflow&quot;,
+date: &quot;January 25, 2023&quot;,
+body: [
+
+= Software to be Installed
+
+- Maildrop
+- Fetchmail
+- Msmtp
+- Mutt
+
+The above software is available in almost all Linux distributions.
+
+```
+sudo yum install maildrop fetchmail msmtp mutt
+```
+
+= Receiving Emails
+
+Two pieces of software are used for receiving emails. First is `fetchmail`, which downloads emails from the server using IMAP or POP3 protocols, and then hands them over to `maildrop` for processing. By default, user emails in Unix-like operating systems are stored in `/var/spool/mail/username`. This is also where `maildrop` saves emails by default. If there are not many emails and no special email filtering needs, you don&#x27;t need to configure `maildrop` and just use the default settings.
+
+As for `fetchmail`, configure it to download unread emails using the IMAP protocol from the `INBOX` and `JUNK` directories. At the same time, do not delete emails, just set them to read:
+
+```
+poll smtp.example.org proto imap
+    username &quot;user@example.org&quot;
+    password &quot;xxxxxxxx&quot;
+    options ssl keep
+    mda &quot;/usr/bin/maildrop&quot;;
+
+poll smtp.example.org proto imap
+    username &quot;user@example.org&quot;
+    password &quot;xxxxxxxx&quot;
+    options ssl keep
+    folder JUNK
+    mda &quot;/usr/bin/maildrop&quot;;
+```
+
+Then run `fetchmail` periodically to check for emails.
+
+= Reading Emails
+
+You can use `mutt` to read emails. By default, `mutt` will examine the `/var/spool/mail/username` file. To display emails in reverse order by session and time, you can set `mutt`&#x27;s email sorting method. Add the following to `~/.muttrc`:
+
+```
+set folder=~/mail
+set sort_aux=last-date-received       
+set sort=threads
+set sort_re
+```
+
+For unwanted emails, you can press the `d` key to mark them for deletion; if you want to move emails to other mailbox files in batches, you can press the `t` key to tag the emails, then press the `;` key, and finally press the `s` key to move the emails.
+
+For emails containing HTML or other attachments, you can use the pipe function to hand them over to the corresponding application for display.
+
+For example, for HTML emails, you can press the `v` key to enter the attachment interface, select the `text/html` attachment, press the `|` key, and then use a custom script to let Firefox display the email:
+
+```
+#!/bin/bash
+
+cat &gt; /tmp/hmail.html
+firefox /tmp/hmail.html
+```
+
+As for images, you can let Eye of Gnome or another image viewer display them:
+
+```
+#!/bin/bash
+
+cat &gt; /tmp/img
+eog /tmp/img
+```
+
+Or just save them directly:
+
+```
+cat &gt; [filename]
+```
+
+= Sending Emails
+
+Unix-like systems use the `sendmail` command by default to send emails, and `msmtp` also provides a `sendmail`-compatible usage. First, configure `~/.msmtprc`:
+
+```
+account mymail
+tls on
+auth on
+host smtp.exmaple.org
+port 587
+user user@example.org
+from user@example.org
+password xxxxxxxx
+logfile /home/user/.msmtp.log
+
+account default : mymail
+```
+
+Then configure your own name by adding the following to `~/.muttrc`:
+
+```
+set from=&quot;Your Fullname Here &lt;user@example.org&gt;&quot;
+```
+
+Subsequently, use
+
+```
+mutt target@example.org
+```
+
+to start editing the email, and finally press the `y` key to send.
+
+= Git Email Workflow
+
+If you want to contribute patches to open-source projects using mailing lists, you need to use the `git send-email` function. Git will use `sendmail` to send emails by default. If `msmtp` is configured, you can use it directly.
+
+If you want to send the content of the last two commits to a mailing list, just run:
+
+```
+git send-email --to target@example.org HEAD~2..HEAD
+```
+
+= Address Book
+
+Linux distributions generally provide a command-line address book application: &quot;abook&quot;. Abook can interoperate with Mutt. However, I personally don&#x27;t think it&#x27;s very useful. It&#x27;s better to just use text files and search with `grep`. So I won&#x27;t repeat it here.
+
+= Why Bother?
+
+Finally, let&#x27;s talk about why you should receive and send emails in the terminal.
+
+First, email is not a complex thing. In most cases, it&#x27;s just plain text. Using a heavy and slow client for such simple information is a bit like killing a fly with a sledgehammer.
+
+Second, in the terminal, the tools used to receive and send emails are traditional Unix tools and their successors, which are very easy to hack and customize to meet specific needs. For example, you can customize a set of email filtering rules or use a script to send emails to yourself. If you are a heavy user of email, this workflow will be very convenient.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2023-01-25-email/index.pdf">
+        <p><a href="/enposts/2023-01-25-email/index.pdf">/enposts/2023-01-25-email/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

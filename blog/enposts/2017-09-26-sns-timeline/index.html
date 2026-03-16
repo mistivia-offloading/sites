@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Talking About Disordered Timelines</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Talking About Disordered Timelines
+#import &quot;/template-en.typ&quot;: doc-template
+
+#doc-template(
+title: &quot;Talking About Disordered Timelines&quot;,
+date: &quot;September 26, 2017&quot;,
+body: [
+
+The biggest difference between social networks and other early internet applications like BBS is the &quot;timeline&quot; mechanism. Early social network timeline mechanisms were very simple: they just arranged the status updates of friends in chronological order. Today, many social networks still maintain this mechanism, such as Tencent&#x27;s Qzone and WeChat Moments. This chronological timeline is simple and clear; when a user scrolls to a certain point in time, they know they have seen all the latest updates and can stop.
+
+However, a new timeline mechanism has been born: the disordered timeline. I must explain that the term &quot;disordered timeline&quot; is not a widely accepted name, but a term I coined to describe this type of timeline mechanism.
+
+I haven&#x27;t found an exact record of the specific date the disordered timeline was invented. In my impression, the first to use this mechanism seemed to be Facebook. Facebook used an algorithm called EdgeRank in its timeline (or News Feed). In 2010, Facebook released a simplified version of EdgeRank, which, from its name, should be a tribute to Google&#x27;s PageRank algorithm. However, EdgeRank doesn&#x27;t seem to be as complex as PageRank, but since it&#x27;s just a simplified version, the real situation remains unknown. This simplified version of the EdgeRank algorithm uses three parameters: affinity, weight, and time decay. Based on these three parameters, Facebook scores the status updates of a user&#x27;s friends and arranges these statuses. This bears some resemblance to Hacker News&#x27;s ranking algorithm. I also found a small website dedicated to #link(&quot;http://edgerank.net/&quot;, &quot;introducing EdgeRank&quot;), whose homepage illustration has an industrial revolution style.
+
+Today, however, Facebook no longer uses the EdgeRank algorithm, but has adopted more complex machine learning algorithms. Compared to EdgeRank, the new machine learning algorithms have more parameters, but the timeline mechanism is generally similar. Meanwhile, Twitter has also begun to adopt a similar mechanism. Starting about a year ago, the tweets on a Twitter user&#x27;s timeline are no longer arranged completely chronologically as they were before; at the same time, the algorithm automatically selects and displays some information liked by other users on the timeline. However, compared to Facebook, Twitter&#x27;s timeline mechanism is still relatively orderly.
+
+Compared to traditional timeline mechanisms, this disordered timeline naturally has some benefits. in traditional social networks, if a user follows too many people, the timeline becomes overcrowded, leaving one overwhelmed in a sea of information. Algorithms like EdgeRank help users make choices, saving them time in a sense. It seems the disordered timeline mechanism is advanced and considers the user&#x27;s interests, but in fact, it is a form of tyranny over users because users lose their freedom; all these social networks that use disordered timelines do so instead of letting users choose freely. This means that disordered timelines are imposed on users.
+
+This disordered timeline tyranny has many harms. First, it indulges users in following other users without restraint. This increases user stickiness in a sense, but it also makes the scale of social networks uncontrollable. If a traditional timeline is used, when the number of followed people is too large and the information is overcrowded, we naturally think of streamlining the number of followed users. But with algorithm recommendations, this concern no longer exists, and there is no longer an upper limit on the number of follows. Second, users no longer have the freedom to choose what content they see; the algorithm decides what users see or don&#x27;t see today. Perhaps the algorithm itself is impartial, but it doesn&#x27;t run on our own computers; it runs on servers. Therefore, its running results can be manipulated by server administrators. So, in the end, it evolves into Silicon Valley giants deciding what users should or shouldn&#x27;t see. The decentralization of the internet brought media power to everyone. However, the increasing centralization of the internet has returned media power to a few, which can only be called a regression. This also seems to explain why Trump&#x27;s base is not Facebook, but Twitter, which has a more traditional timeline mechanism. Human thought activities will inevitably be influenced by the outside world, and this power to manipulate people&#x27;s minds is very worthy of vigilance.
+
+The domestic internet is naturally no exception. Zhihu and Weibo have long introduced such algorithm-recommended disordered timelines. These mechanisms have given these websites the right to limit traffic and promote content at will, and have also given their business operations more space. Every day, countless data packets are sent globally from machines that glow green and hum. These data packets may be the running result of a carefully tuned artificial neural network, or they may directly be the clever design of some person behind the scenes. Some people like this screening, and some don&#x27;t. It&#x27;s just that those who don&#x27;t like it are powerless to change it and have to choose to escape.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2017-09-26-sns-timeline/index.pdf">
+        <p><a href="/enposts/2017-09-26-sns-timeline/index.pdf">/enposts/2017-09-26-sns-timeline/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Colorless Linux</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Colorless Linux
+#import &quot;/template-en.typ&quot;:*
+#doc-template(
+title: &quot;Colorless Linux&quot;,
+date: &quot;July 15, 2023&quot;,
+body: [
+
+The reason for this started when I read an article: &quot;#link(&quot;https://www.wsj.com/video/series/wsj-explains/cant-put-down-your-phone-try-turning-it-grayscale/7B76B4EA-26D0-4F5B-9097-4B3B8B9B167E&quot;)[Can&#x27;t Put Down Your Phone? Try Turning It Grayscale]&quot;
+
+A new study shows that turning your phone screen to black and white is more effective than using applications to limit usage time.
+
+Both iOS and Android have built-in functions to turn the screen display into black and white grayscale, mainly for color-blind groups. Windows 10 also has a similar function. I don&#x27;t have a macOS device at hand right now, but since it&#x27;s on iOS, there&#x27;s no reason why it wouldn&#x27;t be on macOS.
+
+The problem comes to Linux. Linux does not provide such tools natively. The only one relatively close is #link(&quot;https://github.com/jonls/redshift&quot;)[RedShift]. However, the principle of this tool is to adjust Gamma values, so it can only adjust the ratio of red, green, and blue colors, but cannot turn the screen into grayscale.
+
+Finally, the solution I found was to use #link(&quot;https://github.com/yshui/picom&quot;)[picom].
+
+Picom is an X compositor that supports OpenGL rendering, so you can write an OpenGL shader yourself to control the display effect:
+
+```
+#version 330
+
+in vec2 texcoord;
+uniform sampler2D tex;
+
+vec4 window_shader() {
+	vec4 c = texelFetch(tex, ivec2(texcoord), 0);
+
+	float grayscale = c.x * 0.299 + c.y * 0.587 + c.z * 0.114;
+	c.x = grayscale;
+	c.y = grayscale;
+	c.z = grayscale;
+	return c;
+}
+```
+
+Because human eyes have different sensitivity to red, green, and blue colors, the NTSC color-to-black-and-white formula is used here. Red, green, and blue are mixed in a ratio of 0.299:0.587:0.114 to calculate the grayscale value, and then red, green, and blue are all set to this grayscale value to convert the color image to black and white. In fact, using the average value of the intensities of the three colors also works, and the effect is similar.
+
+Save the shader in `~/.picom.glsl`, and then run picom:
+
+```
+picom --backend glx --window-shader-fg &#x27;/home/mistivia/.picom.glsl&#x27; &amp;
+```
+
+You can see the screen turn black and white. If you want it to execute automatically at startup, you can put this line of command into `.xinitrc`. If you want to restore it to color, just kill the picom process.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2023-07-15-colorless-linux/index.pdf">
+        <p><a href="/enposts/2023-07-15-colorless-linux/index.pdf">/enposts/2023-07-15-colorless-linux/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>用C++模拟Mesa Monitor</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// 用C++模拟Mesa Monitor
+#import &quot;/template.typ&quot;:*
+#doc-template(
+title: &quot;用C++模拟Mesa Monitor&quot;,
+date: &quot;2019年6月20日&quot;,
+body: [
+
+Monitor（管程）是并发程序的同步方式之一。Monitor至少有两类，Mesa monitor和Hoare monitor。Mesa monitor在notify之后会继续运行，Hoare monitor在notify之后会进行context switch，来到wait的地方开始运行，所以在写wait的时候，Mesa monitor需要这样：
+
+```
+while (locked)
+    wait();
+```
+
+但是Hoare Monitor只需要这样：
+
+```
+if (locked)
+    wait();
+```
+
+目前还是Mesa Monitor最为常见。
+
+实现 monitor 需要语言层面的支持。Java有`synchronized`关键字，可以用来实现monitor，但是C++就没有了，不过还是可以用condition variable和RAII，来模拟Mesa monitor。
+
+```
+#include &lt;mutex&gt;
+#include &lt;condition_variable&gt;
+
+class Monitor{
+public:
+    Monitor():lk{m, std::defer_lock}{}
+    void notify(){cv.notify_one();}
+    void broadcast(){cv.notify_all();}
+    template&lt;typename F&gt;
+    void wait(F pred){cv.wait(lk, pred);};
+    std::unique_lock&lt;std::mutex&gt; synchronize()
+    {
+    return std::unique_lock&lt;std::mutex&gt;{m};
+    }
+private:
+    std::mutex m;
+    std::unique_lock&lt;std::mutex&gt; lk;
+    std::condition_variable cv;
+};
+```
+
+来看一个简单的例子，用monitor实现互斥锁。虽然这里例子没什么实际意义，但是足够简单：
+
+```
+// To compile: g++ -std=c++14 -lpthread MonitorLock.cpp
+        
+#include &quot;Monitor.h&quot;
+#include &lt;thread&gt;
+#include &lt;iostream&gt;
+
+using namespace std;
+class MonitorLock{
+public:
+    void lock()
+    {
+        // unique_lock 会通过 RAII 自动 unlock
+        auto lk = m.synchronize(); 
+        m.wait([&amp;](){return !locked;});
+        locked = true;
+    }
+    void unlock()
+    {
+        auto lk = m.synchronize();
+        locked = false;
+        m.notify();
+    }
+private:
+    Monitor m;
+    bool locked = false;
+};
+int main()
+{
+    MonitorLock m;
+    thread t1{[&amp;](){
+        for (int i = 1; i &lt;= 30; i++){
+            m.lock();
+            cout &lt;&lt; &quot;t1: &quot; &lt;&lt; i &lt;&lt; endl;
+            m.unlock();
+        }
+    }};
+    thread t2{[&amp;](){
+        for (int i = 1; i &lt;= 30; i++){
+            m.lock();
+            cout &lt;&lt; &quot;t2: &quot; &lt;&lt; i &lt;&lt; endl;
+            m.unlock();
+        }
+    }};
+    t1.join();
+    t2.join();
+    return 0;
+}
+```
+
+另一个例子稍微实用一点，解决生产者消费者问题。
+
+```
+// To compile: g++ -std=c++14 -lpthread ProducerConsumer.cpp
+        
+#include &quot;Monitor.h&quot;
+#include &lt;thread&gt;
+#include &lt;iostream&gt;
+#include &lt;queue&gt;
+
+using namespace std;
+template&lt;typename T, int N&gt;
+class ProducerConsumer{
+public:
+    void insert(T&amp; item)
+    {
+        auto lk = m.synchronize(); 
+        // if(!full)
+        m.wait([&amp;](){return items.size() &lt; N;});
+        items.push(item);
+        if(items.size()  == 1){
+            m.notify();
+        }
+        cout &lt;&lt; &quot;insert: &quot; &lt;&lt; item &lt;&lt; endl;
+    }
+    T remove()
+    {
+        auto lk = m.synchronize();
+        m.wait([&amp;](){return items.size() &gt; 0;}); // if(!empty)
+        auto item = items.front();
+        items.pop();
+        if(items.size() == N-1){
+            m.notify();
+        }
+        cout &lt;&lt; &quot;consume: &quot; &lt;&lt; item &lt;&lt; endl;
+        return item;
+    }
+private:
+    Monitor m;
+    std::queue&lt;T&gt; items;
+};
+int main()
+{
+    ProducerConsumer&lt;int, 10&gt; q;
+    thread p{[&amp;](){
+        for(int i = 1; i &lt; 30; i++){
+            q.insert(i);
+        }
+    }};
+    thread c{[&amp;](){
+        for(int i = 1; i &lt; 30; i++){
+            auto item = q.remove();
+        }
+    }};
+    p.join();
+    c.join();
+    return 0;
+}
+```
+
+上面的例子只适用于单生产者单消费者问题，如果要解决多生产者多消费者问题，一种做法是设置一个 threshold：
+
+```
+// insert()
+if (items.size() &gt;= comsumerThreshold)
+        m.broadcast();
+// remove()
+if(items.size() &lt;= producerThreshold)
+        m.broadcast()
+```
+
+或者更细粒度的控制condition variable的使用：
+
+```
+// To compile: g++ -std=c++14 -lpthread ProducerConsumer.cpp
+        
+#include &lt;thread&gt;
+#include &lt;iostream&gt;
+#include &lt;queue&gt;
+#include &lt;mutex&gt;
+#include &lt;condition_variable&gt;
+
+using namespace std;
+template&lt;typename T, int N&gt;
+class ProducerConsumer{
+public:
+    void insert(T&amp; item)
+    {
+        std::unique_lock&lt;std::mutex&gt; lk{m};
+        insert_cv.wait(lk, [&amp;](){return items.size() &lt; N;}); // if(!full)
+
+        items.push(item);
+        // 如果这里是Hoare monitor就会跳转到正在wait的remove函数，
+        // 可惜这里是mesa
+        remove_cv.notify_one();
+        cout &lt;&lt; &quot;insert: &quot; &lt;&lt; item &lt;&lt; endl;
+    }
+    T remove()
+    {
+        std::unique_lock&lt;std::mutex&gt; lk{m};
+        remove_cv.wait(lk, [&amp;](){return items.size() &gt; 0;}); // if(!empty)
+
+        auto item = items.front();
+        items.pop();
+        insert_cv.notify_one();
+        cout &lt;&lt; &quot;consume: &quot; &lt;&lt; item &lt;&lt; endl;
+        return item;
+    }
+private:
+    mutex m;
+    condition_variable insert_cv, remove_cv;
+    std::queue&lt;T&gt; items;
+};
+int main()
+{
+    ProducerConsumer&lt;int, 10&gt; q;
+    thread p{[&amp;](){
+        for(int i = 1; i &lt; 30; i++){
+            q.insert(i);
+        }
+    }};
+    thread c{[&amp;](){
+        for(int i = 1; i &lt; 30; i++){
+            auto item = q.remove();
+        }
+    }};
+    p.join();
+    c.join();
+    return 0;
+}
+```
+
+])</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/posts/2019-06-20-mesa-monitor/index.pdf">
+        <p><a href="/posts/2019-06-20-mesa-monitor/index.pdf">/posts/2019-06-20-mesa-monitor/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

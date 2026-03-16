@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Type-level Programming: A Most Trivial Example</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Type-level Programming: A Most Trivial Example
+#import &quot;/template-en.typ&quot;: doc-template
+
+#doc-template(
+title: &quot;Type-level Programming: A Most Trivial Example&quot;,
+date: &quot;May 17, 2025&quot;,
+body: [
+
+This article will use Haskell.
+
+First, enable some extensions:
+
+```
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds#-}
+{-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -Werror=incomplete-patterns #-}
+
+import Data.Type.Equality
+```
+
+= Zero and One
+
+Everything in a computer is &quot;zero&quot; and &quot;one&quot;:
+
+```
+data Bit = Zero | One
+```
+
+Create a type for each of the two values in the `Bit` type, &quot;zero&quot; and &quot;one,&quot; which are singleton types:
+
+```
+-- Prefix S is an abbreviation for Singleton
+data SBit :: Bit -&gt; * where
+    SZero :: SBit &#x27;Zero
+    SOne  :: SBit &#x27;One
+```
+
+= NAND Gate
+
+All boolean circuits can be completed with NAND gates, but we must first define the NAND gate:
+
+```
+type family Nand (a :: Bit) (b :: Bit) :: Bit where
+    Nand &#x27;One &#x27;One = &#x27;Zero
+    Nand _ _ = &#x27;One
+```
+
+`type family` gives the &quot;definition,&quot; which can also be called a &quot;specification&quot; (Spec). Whether it is proof or checking, the program must comply with the standard here.
+
+Then we can implement it:
+
+```
+nandGate :: SBit a -&gt; SBit b -&gt; SBit (Nand a b)
+nandGate SOne SOne = SZero
+nandGate SZero _ = SOne
+nandGate _ SZero = SOne
+```
+
+= NOT Gate
+
+Zero becomes one, and one becomes zero; this is the NOT gate. Therefore, give the definition:
+
+```
+type family Not (a :: Bit) :: Bit where
+    Not &#x27;One = &#x27;Zero
+    Not &#x27;Zero = &#x27;One
+```
+
+A NOT gate can be implemented using a NAND gate:
+
+```
+notGateImpl x = nandGate x x
+```
+
+Submit the implementation to the compiler:
+
+```
+notGate :: SBit a -&gt; SBit (Not a)
+notGate = notGateImpl
+```
+
+Rejected by the compiler:
+
+```
+Couldn&#x27;t match type: Nand a a
+            with: Not a
+Expected: SBit a -&gt; SBit (Not a)
+Actual: SBit a -&gt; SBit (Nand a a)
+```
+
+`notGateImpl` returns `SBit (Nand a a)`, while what `notGate` expects is `SBit (Not a)`. We need to prove that `SBit (Not a)` and `SBit (Nand a a)` are the same thing. In this way, conversion can be achieved.
+
+There are two ideas here. The first is to use pure force to crush it, proving by brute-force enumeration that this thing is absolutely true:
+
+```
+notGateProof :: SBit a -&gt; SBit (Nand a a) :~: SBit (Not a)
+notGateProof SOne = Refl
+notGateProof SZero = Refl
+```
+
+Then use this proof to achieve safe type conversion:
+
+```
+notGate :: SBit a -&gt; SBit (Not a)
+notGate x = castWith (notGateProof x) (notGateImpl x)
+```
+
+The NOT gate is complete.
+
+The second idea is to settle for the second best and only add a type constraint:
+
+```
+notGate :: (SBit (Nand a a) ~ SBit (Not a)) =&gt; SBit a -&gt; SBit (Not a)
+notGate x = nandGate x x
+```
+
+This also passes compilation, and the code is relatively simple.
+
+However, this is more like a &quot;static check.&quot; For example, if we deliberately write a wrong implementation:
+
+```
+notGate :: (SBit &#x27;Zero ~ SBit (Not a)) =&gt; SBit a -&gt; SBit (Not a)
+notGate x = SZero
+```
+
+Obviously, `SBit &#x27;Zero` and `SBit (Not a)` are not equivalent when `a` is `&#x27;Zero`, but it still passes compilation.
+
+If a `notGate` call where `x` is `SOne` appears in the program:
+
+```
+zero = notGate SOne
+```
+
+Because the condition happens to be met, it still passes compilation.
+
+Only when a `notGate` call where `x` is `SZero` appears in the program:
+
+```
+one = notGate SZero
+```
+
+will the problem be found in type checking. At this time, the compiler will report an error:
+
+```
+• Couldn&#x27;t match type ‘&#x27;Zero’ with ‘&#x27;One’
+    arising from a use of ‘notGate’
+• In the expression: notGate SZero
+    In an equation for ‘one’: one = notGate SZero 
+```
+
+Since the second method is simpler, it will not be repeated later, and only the first one will be introduced. From a practical point of view, proofs for the first method are often difficult to give, and most of the time &quot;static checks&quot; like the second method are enough.
+
+= AND Gate
+
+What is an AND gate? One and one makes one, and the rest are zero:
+
+```
+type family And (a :: Bit) (b :: Bit) :: Bit where
+    And &#x27;One &#x27;One = &#x27;One
+    And _ _ = &#x27;Zero
+```
+
+A NAND gate plus a NOT gate is an AND gate:
+
+```
+andGateImpl a b = notGate $ nandGate a b
+```
+
+Use enumeration to brute-force proof:
+
+```
+andGateProof :: SBit a -&gt; SBit b -&gt; SBit (Not (Nand a b)) :~: SBit (And a b)
+andGateProof SZero SOne = Refl
+andGateProof SZero SZero = Refl
+andGateProof SOne SOne = Refl
+andGateProof SOne SZero = Refl
+```
+
+Submit to the compiler:
+
+```
+andGate :: SBit a -&gt; SBit b -&gt; SBit (And a b)
+andGate a b = castWith (andGateProof a b) (andGateImpl a b)
+```
+
+The AND gate is complete.
+
+= OR Gate
+
+As usual, first give the definition: zero and zero make zero, and the rest are one:
+
+```
+type family Or (a :: Bit) (b :: Bit) :: Bit where
+    Or &#x27;Zero &#x27;Zero = &#x27;Zero
+    Or _ _ = &#x27;One
+```
+
+Try a fancy implementation method. Use De Morgan&#x27;s laws to combine AND gates and NOT gates into OR gates:
+
+```
+orGateImpl a b = notGate (andGate (notGate a) (notGate b))
+```
+
+Continue with brute-force enumeration to prove I&#x27;m right:
+
+```
+orGateProof :: SBit a -&gt; SBit b
+    -&gt; SBit(Not (And (Not a) (Not b))) :~: SBit (Or a b)
+orGateProof SZero SZero = Refl
+orGateProof SZero SOne = Refl
+orGateProof SOne SZero = Refl
+orGateProof SOne SOne = Refl
+```
+
+The compiler accepts it:
+
+```
+orGate :: SBit a -&gt; SBit b -&gt; SBit (Or a b)
+orGate a b = castWith (orGateProof a b) (orGateImpl a b)
+```
+
+= Conclusion
+
+This is a very trivial example, but it uses quite a few language features, which can be considered a summary of my recent learning. However, if I want to implement non-trivial examples, I often need to use some very complex and ugly Template Haskell libraries, which I don&#x27;t really want to touch. So I&#x27;m planning to look into Lean 4 later.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2025-05-17-singleton-types/index.pdf">
+        <p><a href="/enposts/2025-05-17-singleton-types/index.pdf">/enposts/2025-05-17-singleton-types/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

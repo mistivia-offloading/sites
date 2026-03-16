@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ChatGPT of Antikythera</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// ChatGPT of Antikythera
+#import &quot;/template-en.typ&quot;:*
+#doc-template(
+title: &quot;ChatGPT of Antikythera&quot;,
+date: &quot;April 8, 2023&quot;,
+body: [
+
+Seeing some people compare Large Language Models (LLM) like ChatGPT to the replacement of horse-drawn carriages by cars, such a metaphor may not be appropriate. In the era when cars became popular, human understanding of cars far exceeded that of LLM. At that time, heat engines had been developing for over a hundred years, and several of the most important achievements in classical thermodynamics—the Carnot cycle, the first law of thermodynamics, and the second law of thermodynamics—were already mature. Yet we are still in the dark about fundamental questions like how intelligence is generated, whether the human brain is stronger than a Turing machine and therefore cannot be simulated by one, and so on. At the same time, LLM has not provided us with any answers to these questions so far.
+
+If one were to find something in history close to ChatGPT, I think it would be the #link(&quot;https://en.wikipedia.org/wiki/Antikythera_mechanism&quot;)[Antikythera mechanism].
+
+This mechanical computer, salvaged from an ancient Greek shipwreck, dates back to around 100 BC, yet it could calculate the movement of the sun and moon with amazing precision. Its simulation of lunar motion took into account the velocity difference between perigee and apogee, approaching the results in Kepler&#x27;s laws. It could also calculate the positions of planets and the approximate timing of solar and lunar eclipses, showing incredible mechanical processing technology. For how amazing it is, you can watch the 3D restoration animation in #link(&quot;https://youtu.be/qqlJ50zDgeA?t=273&quot;)[this video].
+
+Two hundred years later, Ptolemy used dozens of epicycles and deferents to fit planetary motion, and even knew about axial precession. Although this is described as an &quot;erroneous, ridiculous, and backward&quot; theory in history books, in terms of mathematical techniques, this technology is quite astonishing: it points directly to the Fourier transform, which did not appear until the 19th century. In fact, as long as there are enough cycles, such a model can fit periodic smooth curves with any precision. However, fitting is just fitting, and no matter how amazing the fitting is, it cannot reveal the essence.
+
+It took another 1,800 years to go from Greek Antikythera to Cambridge, England.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2023-04-08-chatgpt/index.pdf">
+        <p><a href="/enposts/2023-04-08-chatgpt/index.pdf">/enposts/2023-04-08-chatgpt/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>静态链接Go和Rust</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// 静态链接Go和Rust
+#import &quot;/template.typ&quot;:*
+
+#doc-template(
+title: &quot;静态链接Go和Rust&quot;,
+date: &quot;2021年5月21日&quot;,
+body: [
+
+Go和Rust有个很好用的特性：二进制部署。但是在Linux上，编译出来的二进制文件还是依赖glibc。要是开发机和部署机上的glibc版本不一致就麻烦了。所以，如果要直接二进制部署，glibc也要静态链接上。
+
+= Go
+
+```
+go build -tags netgo -ldflags &#x27;-extldflags &quot;-static&quot;&#x27;
+```
+
+= Rust
+
+Rust这里，我在尝试静态链接glibc的时候碰到了奇怪的问题，翻了好久StackOverflow也没有解决。所以我决定改成用musl。比如说在Arch Linux上就这么用：
+
+```
+sudo pacman -S musl
+rustup target add x86_64-unknown-linux-musl
+cargo build --release --target x86_64-unknown-linux-musl
+```
+
+不过因为用了musl，有时候可能会产生兼容问题。
+
+])
+
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/posts/2021-05-21-static-link/index.pdf">
+        <p><a href="/posts/2021-05-21-static-link/index.pdf">/posts/2021-05-21-static-link/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

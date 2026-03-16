@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Static Linking Go and Rust</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Static Linking Go and Rust
+#import &quot;/template-en.typ&quot;:*
+
+#doc-template(
+title: &quot;Static Linking Go and Rust&quot;,
+date: &quot;May 21, 2021&quot;,
+body: [
+
+Go and Rust have a very useful feature: binary deployment. However, on Linux, the compiled binary files still depend on glibc. If the glibc versions on the development machine and the deployment machine are inconsistent, it causes trouble. Therefore, if you want to deploy binary files directly, glibc also needs to be statically linked.
+
+= Go
+
+```
+go build -tags netgo -ldflags &#x27;-extldflags &quot;-static&quot;&#x27;
+```
+
+= Rust
+
+Regarding Rust, I encountered some strange issues while trying to statically link glibc, and I couldn&#x27;t solve them after searching StackOverflow for a long time. So I decided to switch to using musl. For example, on Arch Linux, it&#x27;s done like this:
+
+```
+sudo pacman -S musl
+rustup target add x86_64-unknown-linux-musl
+cargo build --release --target x86_64-unknown-linux-musl
+```
+
+However, because musl is used, compatibility issues may sometimes arise.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2021-05-21-static-link/index.pdf">
+        <p><a href="/enposts/2021-05-21-static-link/index.pdf">/enposts/2021-05-21-static-link/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Evil Scheme</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Evil Scheme
+#import &quot;/template-en.typ&quot;:doc-template
+
+#doc-template(
+title: &quot;Evil Scheme&quot;,
+date: &quot;December 13, 2022&quot;,
+body: [
+
+Because Scheme, like other languages in the Lisp family, is extremely flexible, you can add many strange things to the language. You can even write Scheme code in an imperative way, much like Python, if you wish.
+
+The code in this article is written for GNU Guile and TinyScheme, both of which support old-style Lisp macros. These macros are more common in Common Lisp, are not hygienic, and do not belong to any Scheme standard. However, most interpreters and compilers support them.
+
+For example, if you want to run the code in Racket, you just need to add the following syntax at the beginning:
+
+```
+#lang racket
+
+(define-syntax define-macro
+  (lambda (x)
+    (syntax-case x ()
+      ((_ (macro . args) body ...)
+       #&#x27;(define-macro macro (lambda args body ...)))
+      ((_ macro transformer)
+       #&#x27;(define-syntax macro
+           (lambda (y)
+             (syntax-case y ()
+               ((_ . args)
+                (let ((v (syntax-&gt;datum #&#x27;args)))
+                  (datum-&gt;syntax y (apply transformer v)))))))))))
+```
+
+= hello, world
+
+Python code:
+
+```
+print(&quot;hello, world&quot;)
+```
+
+Function definition:
+
+```
+(define println
+    (lambda x
+      (apply display x)
+      (newline)))
+```
+
+Final effect:
+
+```
+(println &quot;hello world&quot;)
+```
+
+= Def
+
+Python code:
+
+```
+def is_even(x):
+    if x % 2 == 0:
+        return True
+    return False
+```
+
+Macro definition:
+
+```
+(define-macro (def form . body)
+    `(define ,form
+         (call/cc (lambda (return)
+            ,@body))))
+```
+
+Final effect:
+
+```
+(def (is-even x)
+    (cond ((= 0 (modulo x 2))
+        (return #t)))
+    (return #f))
+```
+
+
+= While
+
+Python code:
+
+```
+i = 0
+while True:
+    i = i + 1
+    if x % 2 == 0:
+        continue
+    print(i)
+    if i &gt; 10:
+        break
+```
+
+
+Macro definition:
+
+```
+(define-macro (while condition . body)
+    (let ((loop (gensym)))
+        `(call/cc (lambda (break)
+            (letrec ((,loop (lambda ()
+                (cond (,condition
+                    (call/cc (lambda (continue)
+                            ,@body))
+                    (,loop))))))
+                (,loop))))))
+```
+
+
+Final effect:
+
+```
+(let ((i 0))
+(while #t
+    (set! i (+ i 1))
+    (cond ((= (modulo i 2) 0)
+         (continue)))
+    (cond ((&gt; i 10)
+        (break)))
+    (println i)))
+```
+
+
+= For
+
+Python code:
+
+```
+for i in range(0, 10):
+    print(i)
+```
+
+
+Macro and utility function definitions:
+
+```
+(define (iter-get iter)
+    (cond ((list? iter)
+        (car iter))
+    (else
+        (iter &#x27;get))))
+
+(define (iter-next iter)
+    (cond ((list? iter)
+        (cdr iter))
+    (else
+        (iter &#x27;next))))
+
+(define (range start end)
+    (lambda (method)
+        (cond ((eq? &#x27;get method)
+            (if (&gt;= start end)
+                &#x27;()
+                start))
+        ((eq? &#x27;next method)
+            (range (+ 1 start) end)))))
+
+(define-macro (for i range . body)
+    (let ((loop (gensym))
+          (iter (gensym)))
+    `(call/cc (lambda (break)
+        (letrec
+            ((,loop (lambda (,iter)
+                (if (eq? (iter-get ,iter) &#x27;())
+                    &#x27;()
+                    (let ((,i (iter-get ,iter)))
+                          (call/cc (lambda (continue)
+                             ,@body))
+                          (,loop (iter-next ,iter)))))))
+            (,loop ,range))))))
+```
+
+
+Final effect:
+
+```
+(for i (range 0 10)
+    (println i))
+```
+
+
+= Goto
+
+Let&#x27;s skip this one!
+
+= Fizz Buzz!
+
+Python implementation:
+
+```
+for i in range(35):
+    if i % 15 == 0:
+        print(&quot;FizzBuzz&quot;)
+        continue
+    if i % 3 == 0:
+        print(&quot;Fizz&quot;)
+        continue
+    if i % 5 == 0:
+        print(&quot;Buzz&quot;)
+        continue
+    print(i)
+```
+
+Using Scheme, with the macros above, it can correspond almost one-to-one:
+
+```
+(for i (range 1 35)
+    (cond ((= 0 (modulo i 15))
+        (println &quot;FizzBuzz&quot;)
+        (continue)))
+    (cond ((= 0 (modulo i 3))
+        (println &quot;Fizz&quot;)
+        (continue)))
+    (cond ((= 0 (modulo i 5))
+        (println &quot;Buzz&quot;)
+        (continue)))
+    (println i))
+```
+
+]
+)</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2022-12-13-scheme/index.pdf">
+        <p><a href="/enposts/2022-12-13-scheme/index.pdf">/enposts/2022-12-13-scheme/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

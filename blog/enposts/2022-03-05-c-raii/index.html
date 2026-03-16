@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simulating RAII in C</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Simulating RAII in C
+#import &quot;/template-en.typ&quot;:*
+
+#doc-template(
+title: &quot;Simulating RAII in C&quot;,
+date: &quot;March 5, 2022&quot;,
+body: [
+
+#set heading(numbering: none)
+
+Resource safety is much more difficult in C than in C++. With the RAII mechanism in C++, resource safety is quite handy. No wonder the first half of Stroustrup&#x27;s &quot;The C++ Programming Language&quot; is about memory safety and resource safety, all of which are guaranteed by RAII. Once a local variable goes out of scope, its destructor is called, which is very convenient.
+
+However, C language does not have such a useful tool, for example:
+
+```c
+int foo() {
+    FILE* fp = fopen(&quot;bar&quot;, &quot;w&quot;);
+    if (f == 0) {
+        error(&quot;failed to open file&quot;);
+        return -1;
+    }
+    int ret = do_something(fp);
+    if (ret &lt; 0) {
+        error(&quot;failed to process file&quot;);
+        fclose(fp);
+        return -1;
+    }
+    fprintf(fp, &quot;this end it&quot;);
+    fclose(fp);
+    return 0;
+}
+```
+
+This is just a simple example, and `fclose` appears twice here; however, when the program&#x27;s control flow becomes complex, resource recovery becomes terrifying. Unlike in C++, where you only need to open an `ofstream` and then leave the rest to the destructor.
+
+In addition to C++, other languages have similar mechanisms. For example, Java and Go have garbage collection for handling memory. As for other resources, such as file handles, network connections, mutexes, etc., Java uses `try...catch...finally...`, and Go uses `defer`.
+
+So what should be done in C? Fortunately, GCC provides a #link(&quot;https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#Common-Variable-Attributes&quot;)[cleanup extension] that can be used to register destructors.
+
+The above example of closing a file can be rewritten using this extension as follows:
+
+```c
+void close_file(FILE** fp_ptr) {
+    if (*fp_ptr == NULL) return;
+    fprintf(*fp_ptr, &quot;file is closed\n&quot;);
+    fclose(*fp_ptr);
+}
+
+int foo() {
+    __attribute__((cleanup(close_file))) FILE* fp = fopen(&quot;bar&quot;, &quot;w&quot;);
+    if (fp == NULL) {
+        error(&quot;failed to open file&quot;);
+        return -1;
+    }
+    int ret = do_something(fp);
+    if (ret &lt; 0) {
+        error(&quot;failed to process file&quot;);
+        return -1;
+    }
+    fprintf(fp, &quot;this end it\n&quot;);
+    return 0;
+}
+```
+
+With this cleanup attribute, `close_file` can be executed automatically, saving the trouble of manual management.
+
+To make the code more compact, a lexical macro can also be added.
+
+```c
+#define CLEANUP(func) __attribute__((cleanup(func)))
+```
+
+Mutexes are similar:
+
+```c
+pthread_mutex_t mutex;
+int count;
+
+void unlock_mutex(pthread_mutex_t **mutex_ptr) {
+    pthread_mutex_unlock(*mutex_ptr);
+}
+
+void *thread_run(void *arg){
+    int i;
+    int ret = pthread_mutex_lock(&amp;mutex);
+    if (ret != 0) {
+        error(&quot;failed to acqure lock&quot;);
+        return 0;
+    }
+    CLEANUP(unlock_mutex) pthread_mutex_t *defer_mutex = &amp;mutex;
+    for (i = 0; i &lt; 3; i++) {
+        printf(&quot;[%ld]count: %d\n&quot;, pthread_self(), ++count);
+    }
+    return 0;
+}
+
+int main() {
+    pthread_t threads[10];
+    for (int i = 0; i &lt; 10; i++) {
+        int res = pthread_create(&amp;threads[i], NULL, thread_run, NULL);
+        if (res) error(&quot;create thread error&quot;);
+    }
+    for (int i = 0; i &lt; 10; i++) {
+        void *ret;
+        pthread_join(threads[i], &amp;ret);
+    }
+    return 0;
+}
+```
+
+Although this is a GCC extension, the Clang/LLVM toolchain also supports it.
+
+If you want a more general way, you can also use the `goto` statement. Although `goto` is generally considered a bad practice, in the scenario of resource recovery, it is actually considered a good practice:
+
+```c
+int foo() {
+    FILE* fp = fopen(&quot;bar&quot;, &quot;w&quot;);
+    if (f == 0) {
+        error(&quot;failed to open file&quot;);
+        goto clean_0;
+    }
+    int ret = do_something(fp);
+    if (ret &lt; 0) {
+        error(&quot;failed to process file&quot;);
+        goto clean_1;
+    }
+    fprintf(fp, &quot;this end it&quot;);
+    fclose(fp);
+    return 0;
+
+clean_1:
+    fclose(fp);
+clean_0:
+    return -1;
+}
+```
+
+Alternatively, you can also try using macros:
+
+```c
+int foo() {
+    FILE* fp = NULL;
+    #define DEFER \
+        if (fp != NULL) fclose(fp);
+
+    fp = fopen(&quot;bar&quot;, &quot;w&quot;);
+    if (f == 0) {
+        error(&quot;failed to open file&quot;);
+        DEFER return -1;
+    }
+    int ret = do_something(fp);
+    if (ret &lt; 0) {
+        error(&quot;failed to process file&quot;);
+        DEFER return -1;
+    }
+    fprintf(fp, &quot;this end it&quot;);
+    DEFER return 0;
+    #undef DEFER
+}
+```
+
+= Summary
+
+All in all, the `goto` statement seems to be the best.
+
+On the other hand, there is also a #link(&quot;http://www.open-std.org/jtc1/sc22/wg14/www/docs/n2895.htm&quot;)[proposal to add defer to the C language], but no one knows whether it will enter the standard, so let&#x27;s wait and see.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2022-03-05-c-raii/index.pdf">
+        <p><a href="/enposts/2022-03-05-c-raii/index.pdf">/enposts/2022-03-05-c-raii/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

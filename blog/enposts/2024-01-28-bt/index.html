@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Becoming a BT Cyber Bodhisattva Without a Public IP</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Becoming a BT Cyber Bodhisattva Without a Public IP
+#import &quot;/template-en.typ&quot;:*
+#doc-template(
+title: &quot;Becoming a BT Cyber Bodhisattva Without a Public IP&quot;,
+date: &quot;January 28, 2024&quot;,
+body: [
+
+When using BitTorrent to download resources, the client enters a seeding state to upload after the download ends. At this time, BT connections are generally incoming connections. If you don&#x27;t have a public IP, there is no way to upload. The China Mobile broadband I am currently using is a broadband without a public IP.
+
+However, I have several VPS servers with public IPs, and these servers can be used as stepping stones.
+
+First, I established a mesh VPN network using Tailscale. My laptop&#x27;s Tailscale IP is 100.64.0.13, and the VPS server&#x27;s Tailscale IP is 100.64.0.30.
+
+Using `tmux` + `ssh`, a SOCKS5 proxy can be quickly set up on the VPS server:
+
+```
+ssh -D 100.64.0.30:1080 127.0.0.1
+```
+
+The BitTorrent client I use is qBitTorrent, and I have fixed the listening port to 42318. Using the Nginx stream module, port reverse proxy can be set up:
+
+```
+stream {
+	server {
+		listen 0.0.0.0:42318;
+		proxy_pass 100.64.0.13:42318;
+	}
+	server {
+		listen 0.0.0.0:42318 udp;
+		proxy_pass 100.64.0.13:42318;
+	}
+}
+```
+
+Then configure qBitTorrent.
+
+Tools -&gt; Preferences -&gt; Connection: Set the listening port to 42318, set the proxy server to 100.64.0.30, port 1080, use the proxy server for peer connections, and use the proxy for hostname lookup.
+
+Tools -&gt; Preferences -&gt; BitTorrent: Add tracker servers, you can refer to #link(&quot;https://github.com/ngosang/trackerslist&quot;)[this list].
+
+Tools -&gt; Preferences -&gt; Advanced: Since all incoming connections will have the same IP after being proxied by Nginx, select &quot;Allow multiple connections from the same IP address&quot; here.
+
+After applying the settings and restarting qBitTorrent, you can start your charity as a BT Cyber Bodhisattva.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2024-01-28-bt/index.pdf">
+        <p><a href="/enposts/2024-01-28-bt/index.pdf">/enposts/2024-01-28-bt/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

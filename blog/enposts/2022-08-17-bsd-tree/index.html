@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Living on a BSD Tree</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Living on a BSD Tree
+#import &quot;/template-en.typ&quot;:doc-template
+
+#doc-template(
+title: &quot;Living on a BSD Tree&quot;,
+date: &quot;August 17, 2022&quot;,
+body: [
+
+FreeBSD and OpenBSD systems both come with #link(&quot;https://github.com/openbsd/src/blob/master/sys/sys/tree.h&quot;)[a very useful implementation of red-black trees and splay trees].
+
+This implementation is header-only, has no external dependencies, and is generic. Therefore, it is very easy to use on Linux as well.
+
+= Getting the Header File
+
+Run:
+
+```
+curl https://raw.githubusercontent.com/openbsd/src/master/sys/sys/tree.h -o tree.h
+```
+
+This header file includes `sys/_null.h`, which does not exist on Linux. However, `tree.h` only uses this file to define `NULL`, so you can just change it to `stdlib.h`.
+
+```
+// #include &lt;sys/_null.h&gt;
+#include &lt;stdlib.h&gt;
+```
+
+= Declaration
+
+The trees in the `tree.h` header file are actually entirely macros, so they need to be expanded before use. For example, if you want the value type in the tree to be `double`, create a new header file `double_tree.h` and declare it like this:
+
+```
+#ifndef DOUBLE_TREE_H_
+#define DOUBLE_TREE_H_
+
+#include &quot;tree.h&quot;
+
+struct double_treenode {
+    RB_ENTRY(double_treenode) entry;
+    double val;
+};
+
+int double_cmp(struct double_treenode *e1, struct double_treenode *e2);
+
+RB_HEAD(double_tree, double_treenode);
+RB_PROTOTYPE(double_tree, double_treenode, entry, double_cmp)
+
+#endif
+```
+
+= Definition
+
+Then create the source file `double_tree.h` and add the necessary function definitions:
+
+```
+#include &quot;double_tree.h&quot;
+
+int double_cmp(struct double_treenode *e1, struct double_treenode *e2); {
+    if (e1-&gt;val &lt; e2-&gt;val) {
+        return -1;
+    } else if (e1-&gt;val &gt; e2-&gt;val) {
+        return 1;
+    }
+    return 0;
+}
+
+RB_GENERATE(double_tree, double_treenode, entry, double_cmp)
+```
+
+= Usage
+
+Next, we will introduce how to use this `double_tree`.
+
+== Initialization
+
+Create the tree and initialize it:
+
+```
+RB_HEAD(double_tree, double_treenode) head;
+RB_INIT(&amp;head);
+```
+
+Initialization can also be completed in one line:
+
+```
+RB_HEAD(double_tree, double_treenode) head = RB_INITIALIZER(&amp;head);
+```
+
+== Insertion
+
+```
+struct double_treenode *n;
+double data[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+for (int i = 0; i &lt; 5; i++) {
+    n = malloc(sizeof(struct double_treenode));
+    n-&gt;val = data[i];
+    RB_INSERT(double_tree, &amp;head, n);
+}
+```
+
+== Search and Deletion
+
+```
+struct double_treenode find;
+find.val = 3.0
+
+struct double_treenode *iter;
+iter = RB_FIND(double_tree, &amp;head, &amp;find);
+
+if (iter != NULL) {
+    printf(&quot;Found\n&quot;);
+    RB_REMOVE(double_tree, &amp;head, iter);
+    free(iter);
+}
+```
+
+== Traversal
+
+```
+RB_FOREACH(iter, double_tree, &amp;head) {
+    // Do something on iter-&gt;val
+    ...
+}
+```
+
+In fact, `RB_FOREACH(iter, double_tree, &amp;head)` is essentially:
+
+```
+for (iter = RB_MIN(double_tree, &amp;head);
+        iter != NULL;
+        iter = RB_NEXT(double_tree, &amp;head, iter))
+```
+
+You can use `RB_MIN` to get the minimum node in the tree; use `RB_NEXT` to get the next element of `iter`; and `RB_MAX` is the maximum node.
+
+If you want to traverse the tree in other orders, you can use `RB_LEFT` and `RB_RIGHT`. For example, printing the tree using pre-order traversal:
+
+```
+void
+print_tree(struct double_treenode *n)
+{
+    struct double_treenode *left, *right;
+
+    if (n == NULL) {
+        printf(&quot;nil&quot;);
+        return;
+    }
+    left = RB_LEFT(n, entry);
+    right = RB_RIGHT(n, entry);
+    if (left == NULL &amp;&amp; right == NULL)
+        printf(&quot;%d&quot;, n-&gt;val);
+    else {
+        printf(&quot;%d(&quot;, n-&gt;val);
+        print_tree(left);
+        printf(&quot;,&quot;);
+        print_tree(right);
+        printf(&quot;)&quot;);
+    }
+}
+```
+
+= Others
+
+There is a very strange thing: Arch Linux has the man documentation for `tree.h`, which you can see by executing `man 3 tree`, but the header file itself cannot be found.
+
+This article only covers red-black trees, but splay trees are actually quite similar, so I won&#x27;t go into detail. You can directly check the #link(&quot;https://www.freebsd.org/cgi/man.cgi?query=tree&amp;sektion=3&amp;format=html&quot;)[documentation].
+
+= Errata
+
+Thanks to #link(&quot;https://c7.io/@w3cing&quot;)[\@w3cing] for the #link(&quot;https://mstdn.party/@w3cing@c7.io/111659300344465706&quot;)[reminder]. The `RB_TREE` in `tree.h` provided by FreeBSD is actually not a red-black tree; RB refers to a rank-balanced tree, and the specific implementation is a weak AVL tree. FreeBSD made an #link(&quot;https://github.com/freebsd/freebsd-src/commit/e605dcc939848312a201b4aa53bd7bb67d862b18&quot;)[update] to `tree.h` in August 2020.
+]
+)
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2022-08-17-bsd-tree/index.pdf">
+        <p><a href="/enposts/2022-08-17-bsd-tree/index.pdf">/enposts/2022-08-17-bsd-tree/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

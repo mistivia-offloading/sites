@@ -84,7 +84,7 @@ Looking at the two quines in the previous section, although they appear quite di
 
 Although it sounds simple, in most common programming languages, expressing strings requires additional escaping for characters like newlines and quotation marks. For example, a newline must be written as `\n`, and quotation marks must be preceded by a backslash. This content brings unnecessary trouble, which is also why the code above is hard to read.
 
-However, these escape characters are essentially a form of **encoding**. So, my idea is to directly encode the *DNA* string into the simplest hexadecimal form and then decode it when it needs to be printed.
+However, these escape characters are essentially a form of *encoding*. So, my idea is to directly encode the *DNA* string into the simplest hexadecimal form and then decode it when it needs to be printed.
 
 This way, no weird hacks are needed.
 

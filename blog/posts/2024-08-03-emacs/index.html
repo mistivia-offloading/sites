@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Emacs手札</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Emacs手札
+#import &quot;/template.typ&quot;:*
+#doc-template(
+title: &quot;Emacs手札&quot;,
+date: &quot;2024年8月3日&quot;,
+body: [
+
+
+最近把主力编辑器从VSCode切换到了Emacs，这里给配置过程做一下记录。
+
+= 基本设置
+
+让Emacs把临时文件都放到`/tmp`中，以免污染当前目录：
+
+```
+(setq backup-directory-alist
+        `((&quot;.*&quot; . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+        `((&quot;.*&quot; ,temporary-file-directory t)))
+```
+
+设置字体：
+
+```
+(set-frame-font &quot;monospace 13&quot; nil t)
+(set-fontset-font t &#x27;han &quot;Source Han Sans CN&quot;)
+```
+
+开启行号显示：
+
+```
+(global-display-line-numbers-mode 1)
+```
+
+标题栏和工具栏大多数情况下没有用，反而会占屏幕空间，因此这里把它们隐藏，如果需要用到的话可以用`F10`呼出。
+
+```
+(menu-bar-mode -1) 
+(toggle-scroll-bar -1) 
+(tool-bar-mode -1)
+```
+
+= 包管理
+
+把Melpa加入Emacs：
+
+```
+(add-to-list &#x27;package-archives &#x27;(&quot;melpa&quot; . &quot;https://melpa.org/packages/&quot;) t)
+```
+
+启用包管理器：
+
+```
+(require &#x27;package)
+(package-initialize)
+```
+
+随后重启Emacs，更新包目录：`M-x package-refresh-contents`。
+
+使用`M-x package-install`依次安装下列功能包：
+
+```
+- magit
+- lsp-mode
+- rust-mode
+- dired-sidebar
+- treesit-auto
+- use-package
+- yasnippet
+- rg
+- counsel
+- ivy
+- lsp-ivy
+- projectile
+- company
+```
+
+如果要更新所有安装的包：`M-x list-package RET S-u x`
+
+= Treesit
+
+启用内置的treesit然后利用`treesit-auto`自动配置：
+
+```
+(require &#x27;treesit)
+
+(use-package treesit-auto
+    :config
+    (global-treesit-auto-mode))
+```
+
+然后安装语法库：`M-x treesit-auto-install-all`
+
+= Typst
+
+typst模式这个包不在Melpa中，需要从git安装：`M-x package-vc-install`。地址为：
+
+```
+https://git.sr.ht/~meow_king/typst-ts-mode
+```
+
+然后编译安装typst的treesit库：先输入
+
+```
+    M-: (treesit-install-language-grammar &#x27;typst) RET
+```
+
+然后输入
+
+```
+https://github.com/uben0/tree-sitter-typst`
+```
+
+配置：
+
+```
+(use-package typst-ts-mode
+    :custom
+    (typst-ts-mode-grammar-location
+    (expand-file-name &quot;tree-sitter/libtree-sitter-typst.so&quot;
+                        user-emacs-directory)))
+```
+
+= Ivy
+
+Ivy是一个minibuffer的补全工具，也有人用helm，不过我觉得ivy更轻更简洁一点。
+
+```
+(require &#x27;ivy)
+(require &#x27;counsel)
+(ivy-mode)
+(setq ivy-use-virtual-buffers t)
+(setq enable-recursive-minibuffers t)
+(global-set-key &quot;\C-s&quot; &#x27;swiper)
+(global-set-key (kbd &quot;C-c C-r&quot;) &#x27;ivy-resume)
+(global-set-key (kbd &quot;&lt;f6&gt;&quot;) &#x27;ivy-resume)
+(global-set-key (kbd &quot;M-x&quot;) &#x27;counsel-M-x)
+(global-set-key (kbd &quot;C-x C-f&quot;) &#x27;counsel-find-file)
+(global-set-key (kbd &quot;&lt;f1&gt; f&quot;) &#x27;counsel-describe-function)
+(global-set-key (kbd &quot;&lt;f1&gt; v&quot;) &#x27;counsel-describe-variable)
+(global-set-key (kbd &quot;&lt;f1&gt; o&quot;) &#x27;counsel-describe-symbol)
+(global-set-key (kbd &quot;&lt;f1&gt; l&quot;) &#x27;counsel-find-library)
+(global-set-key (kbd &quot;&lt;f2&gt; i&quot;) &#x27;counsel-info-lookup-symbol)
+(global-set-key (kbd &quot;&lt;f2&gt; u&quot;) &#x27;counsel-unicode-char)
+(global-set-key (kbd &quot;C-c g&quot;) &#x27;counsel-git)
+(global-set-key (kbd &quot;C-c j&quot;) &#x27;counsel-git-grep)
+(global-set-key (kbd &quot;C-c k&quot;) &#x27;counsel-ag)
+(global-set-key (kbd &quot;C-x l&quot;) &#x27;counsel-locate)
+(global-set-key (kbd &quot;C-S-o&quot;) &#x27;counsel-rhythmbox)
+(define-key minibuffer-local-map (kbd &quot;C-r&quot;) &#x27;counsel-minibuffer-history)
+```
+
+= LSP
+
+这里先只安装Rust的lsp功能：
+
+```
+(use-package company)
+(use-package rust-mode)
+(use-package lsp-mode
+    :init
+    ;; set prefix for lsp-command-keymap (few alternatives - &quot;C-l&quot;, &quot;C-c l&quot;)
+    (setq lsp-keymap-prefix &quot;C-c l&quot;)
+    :hook (
+            (rust-mode . lsp)
+            ;; if you want which-key integration
+            (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+(use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+```
+
+= 文件浏览器侧栏
+
+使用`dired-sidebar`：
+
+```
+(use-package dired-sidebar
+    :bind ((&quot;C-x C-n&quot; . dired-sidebar-toggle-sidebar))
+    :ensure t
+    :commands (dired-sidebar-toggle-sidebar)
+    :init
+    (add-hook &#x27;dired-sidebar-mode-hook
+            (lambda ()
+                (unless (file-remote-p default-directory)
+                (auto-revert-mode))))
+    :config
+    (push &#x27;toggle-window-split dired-sidebar-toggle-hidden-commands)
+    (push &#x27;rotate-windows dired-sidebar-toggle-hidden-commands)
+
+    (setq dired-sidebar-subtree-line-prefix &quot;__&quot;)
+    (setq dired-sidebar-theme &#x27;vscode)
+    (setq dired-sidebar-use-term-integration t)
+    (setq dired-sidebar-use-custom-font t))
+```
+
+然后使用`C-x C-n`可以呼出侧栏。
+
+= Projectile
+
+使用`C-c p`快速在项目中跳转到文件，类似于Vim的CtrlP：
+
+```
+(projectile-mode +1)
+;; Recommended keymap prefix on Windows/Linux
+(define-key projectile-mode-map (kbd &quot;C-c p&quot;) &#x27;projectile-command-map)
+```
+
+= Snippet
+
+使用`yasnippet`插件：
+
+```
+(use-package yasnippet
+    :bind
+    ((&quot;C-c n i&quot; . yas-insert-snippet))  
+    :config
+    (add-to-list &#x27;yas-snippet-dirs &quot;~/.emacs.d/snippets&quot;)
+    (yas-global-mode 1))
+```
+
+Snippet保存在`~/.emacs.d/snippets/{模式名}/`目录下。
+
+= Ripgrep
+
+使用rg插件可以快速在项目目录中搜索文本内容：
+
+```
+(require &#x27;rg)
+(rg-enable-default-bindings)
+```
+
+最常用的快捷键是`C-c p f`，可以在Projectile项目中搜索。
+
+= Magit
+
+Magit插件功能比较繁杂，这里不再赘述了，可以去看magit网站上的教程。
+
+启用：
+
+```
+(require &#x27;magit)
+```
+
+= Markdown
+
+直接加载Markdown模式即可：
+
+```
+(use-package markdown-mode)
+```
+
+
+])
+
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/posts/2024-08-03-emacs/index.pdf">
+        <p><a href="/posts/2024-08-03-emacs/index.pdf">/posts/2024-08-03-emacs/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

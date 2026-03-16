@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Some C/C++ Optimization Tools</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Some C/C++ Optimization Tools
+#import &quot;/template-en.typ&quot;:*
+
+#doc-template(
+title: &quot;Some C/C++ Optimization Tools&quot;,
+date: &quot;November 13, 2021&quot;,
+body: [
+
+= Performance Data Collection
+
+== perf
+
+On Linux, perf is commonly used to collect performance data. For the use of perf, you can refer to #link(&quot;https://www.brendangregg.com/perf.html&quot;)[Brendan Gregg&#x27;s website].
+
+The most commonly used commands are `perf record` and `perf report`, and the common metrics include cycles, branch miss, cache miss, etc.
+
+Then, the #link(&quot;https://github.com/brendangregg/FlameGraph&quot;)[FlameGraph tool] can be used to generate flame graphs, which visually display where performance is consumed.
+
+== How perf Works
+
+Collecting data like cycles, branch miss, and cache miss mainly utilizes the Performance Monitoring Unit (PMU) in the CPU. The PMU is actually a counter in the CPU that increments when specific events occur and can report register states to the kernel, especially the state of the Program Counter register, so that we can know where branch misses and cache misses occur.
+
+Because it causes performance loss, a sampling mode is generally used when using the PMU. For example, a report is made only after every ten thousand cache misses.
+
+In addition, Intel CPUs have a feature called Last Branch Record (LBR), which can record control flow and is also used by perf to find hotspots in the program.
+
+For the principles of PMU and LBR, see:
+
+- #link(&quot;http://rts.lab.asu.edu/web_438/project_final/Talk%209%20Performance%20Monitoring%20Unit.pdf&quot;)[Performance Monitoring Unit]
+- #link(&quot;https://easyperf.net/blog/2018/06/01/PMU-counters-and-profiling-basics&quot;)[PMU counters and profiling basics. | Easyperf - Denis Bakhvalov]
+- #link(&quot;https://lwn.net/Articles/680985/&quot;)[An introduction to last branch records]
+
+= Manual Optimization
+
+Regarding how to optimize programs, there are some common-sense clichés that apply everywhere, such as how to optimize system calls, how to use locks, using the -O3 compilation option, and so on. However, there are also some more subtle things.
+
+One is the likely/unlikely macros, which depend on the `__builtin_expect` function in GCC. As follows:
+
+```
+#define likely(x)       __builtin_expect((x),1)
+#define unlikely(x)     __builtin_expect((x),0)
+```
+
+This macro can tell the compiler which branch is more likely to be taken. Based on these hints, the compiler can make corresponding optimizations to prevent jumps that are too long, thereby improving the success rate of branch prediction and reducing the possibility of page faults when the program is loaded.
+
+Starting from C++20, likely and unlikely have entered the C++ standard in the form of attributes. The usage is as follows:
+
+```
+double pow(double x, long long n) {
+    if (n &gt; 0) [[likely]]
+        return x * pow(x, n - 1);
+    else [[unlikely]]
+        return 1;
+}
+```
+
+In addition, there are also some builtin features that can hint the compiler to exercise more precise control over the cache, such as `__builtin_prefetch`.
+
+See:
+
+- #link(&quot;https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html&quot;)[Other Builtins (Using the GNU Compiler Collection (GCC))]
+- #link(&quot;https://en.cppreference.com/w/cpp/language/attributes/likely&quot;)[C++ attribute: likely, unlikely (since C++20)]
+
+= Automatic Optimization
+
+The above manual optimization is often cumbersome in actual operation, so it can only be used in a small number of hotspots. If you want to perform a large number of optimizations on the program, it is inevitable to use automation tools.
+
+== LTO
+
+LTO stands for Link-Time Optimization. LTO can perform global optimization on the program instead of just focusing on local parts, so it can execute more aggressive optimization strategies. However, the disadvantage is that the optimization method is more complex and the memory consumption is large; to address these disadvantages, there is Thin LTO. LTO is also very simple to use: compile with clang, and then add `-flto` or `-flto=thin` during compilation and linking.
+
+See:
+
+- #link(&quot;https://llvm.org/docs/LinkTimeOptimization.html&quot;)[LLVM Link Time Optimization: Design and Implementation]
+- #link(&quot;http://blog.llvm.org/2016/06/thinlto-scalable-and-incremental-lto.html&quot;)[ThinLTO: Scalable and Incremental LTO]
+
+== PGO
+
+PGO stands for Profile-Guided Optimization, which guides compiler optimization through Profile data by building an execution model during compilation. GCC already provides this feature. However, the disadvantage is that this process is usually very time-consuming, it is difficult to collect datasets, and building models is also complex. To this end, Google has done some work related to PGO automation and open-sourced AutoFDO (Automatic Feedback-Directed Optimization), which uses data collected from production machines for feedback optimization. However, although Google&#x27;s AutoFDO is open-sourced, there seem to be no detailed instructions for use on GitHub, and only some scattered materials can be found.
+
+See:
+
+- #link(&quot;https://rigtorp.se/notes/pgo/&quot;)[Profile-guided optimization]
+- #link(&quot;https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html&quot;)[GCC: Options That Control Optimization]
+- #link(&quot;https://github.com/google/autofdo&quot;)[google/autofdo]
+- #link(&quot;https://research.google/pubs/pub45290/&quot;)[AutoFDO: Automatic Feedback-Directed Optimization for Warehouse-Scale Applications]
+- #link(&quot;https://clang.llvm.org/docs/UsersManual.html#using-sampling-profilers&quot;)[LLVM Docs: Using Sampling Profilers]
+- #link(&quot;https://gcc.gnu.org/wiki/AutoFDO/Tutorial&quot;)[GCC Wiki: AutoFDO Tutorial]
+- #link(&quot;https://stackoverflow.com/questions/4365980/how-to-use-profile-guided-optimizations-in-g&quot;)[How to use profile guided optimizations in g++?]
+
+== BOLT
+
+BOLT was developed by Facebook (now renamed Meta) and is also a feedback optimization, standing for Binary Optimization and Layout Tool. According to Facebook&#x27;s data, BOLT brought an 8% performance improvement to their Hack language (a PHP-like) virtual machine #link(&quot;https://hhvm.com/&quot;)[HHVM].
+
+See:
+
+- #link(&quot;https://github.com/facebookincubator/BOLT&quot;)[facebookincubator/BOLT - GitHub]
+- #link(&quot;https://engineering.fb.com/2018/06/19/data-infrastructure/accelerate-large-scale-applications-with-bolt/&quot;)[Accelerate large-scale applications with BOLT]
+
+As its name suggests, BOLT does not require source code during optimization and can directly operate on binaries. By rearranging code and optimizing control flow, it improves the efficiency of the instruction cache. If the program depends on some binary libraries without source code, BOLT has a great advantage in this scenario.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2021-11-13-c-optimize/index.pdf">
+        <p><a href="/enposts/2021-11-13-c-optimize/index.pdf">/enposts/2021-11-13-c-optimize/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Creating Text Processing Tools with Vim</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Creating Text Processing Tools with Vim
+#import &quot;/template-en.typ&quot;:doc-template
+
+#doc-template(
+title: &quot;Creating Text Processing Tools with Vim&quot;,
+date: &quot;December 3, 2022&quot;,
+body: [
+
+First, create a Vim script. For example, a script to automatically wrap text at column 70 is as follows:
+
+```
+:set tw=70
+gggqG
+:wq
+```
+
+Save it as `~/.vim/scripts/wrap`, and then you can process a file:
+
+```
+vim -s ~/.vim/scripts/wrap input.txt
+```
+
+If you want to use it with stdin and stdout so it can be used in a pipeline and called by other programs, you can wrap it with a bash script:
+
+```
+#!/bin/bash
+
+BUF=/tmp/$(head -c 15 /dev/urandom | base32)
+cat &gt; $BUF
+/usr/bin/vim -s ~/.vim/scripts/wrap $BUF 1&gt;/dev/null 2&gt;/dev/null
+cat $BUF
+rm $BUF
+```
+
+And just like that, a small tool is complete.
+
+]
+)</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2022-12-03-vim/index.pdf">
+        <p><a href="/enposts/2022-12-03-vim/index.pdf">/enposts/2022-12-03-vim/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

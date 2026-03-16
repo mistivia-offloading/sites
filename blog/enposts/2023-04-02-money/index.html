@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Money Expansion in Modern Economy</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Money Expansion in Modern Economy
+#import &quot;/template-en.typ&quot;:*
+#doc-template(
+title: &quot;Money Expansion in Modern Economy&quot;,
+date: &quot;April 2, 2023&quot;,
+body: [
+
+Recently, there have been several news reports about bank failures, such as Silicon Valley Bank and Credit Suisse. So, I suddenly became interested in how banks and money work. I happened to see an article from the Bank of England (the UK&#x27;s central bank) published in 2014. I thought it was well-written, so I took some time to read it.
+
+- #link(&quot;https://www.bankofengland.co.uk/-/media/boe/files/quarterly-bulletin/2014/money-creation-in-the-modern-economy.pdf&quot;)[Money Creation in the Modern Economy]
+
+There&#x27;s probably no point in taking time to restate the article&#x27;s content. Although it&#x27;s a relatively professional article that might be a bit of a headache to read, with tools like ChatGPT, these problems no longer exist.
+
+The content included in this article covers:
+
+- A case study: Using balance sheets to analyze the impact of borrowing for home purchases on the economy and money, and why money is created by commercial banks when they lend and destroyed when they repay;
+- Several negative feedback adjustment mechanisms to prevent infinite expansion of money;
+- Why the money multiplier theory is incorrect;
+- Why commercial banks in modern economies are no longer intermediaries that lend depositors&#x27; money, but have themselves become creators of money;
+- What quantitative easing (QE) is, and why QE is not simply printing money.
+
+Finally, there is an appendix explaining what terms like M0/M1/M2/... in the money supply mean.
+
+In short, in this era of gathering storms and heightened anxiety, if you are confused by various terms in economic news, this article is well worth reading.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2023-04-02-money/index.pdf">
+        <p><a href="/enposts/2023-04-02-money/index.pdf">/enposts/2023-04-02-money/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

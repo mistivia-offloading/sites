@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Developing a Danmaku Reader</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// Developing a Danmaku Reader
+#import &quot;/template-en.typ&quot;:*
+
+#doc-template(
+title: &quot;Developing a Danmaku Reader&quot;,
+date: &quot;October 19, 2021&quot;,
+body: [
+
+I recently have plans to become a transparent, silent-type vTuber. To increase the entertainment effect, I created a Danmaku (bullet chat) reader. Since I didn&#x27;t want to spend too much time, I chose Python for a quick solution.
+
+= How to Read Aloud
+
+I directly used the built-in speech synthesis feature of the Windows operating system: #link(&quot;https://docs.microsoft.com/en-us/previous-versions/windows/desktop/ms723602(v=vs.85)&quot;, &quot;SpVoice&quot;).
+
+This interface can be called using #link(&quot;https://pypi.org/project/pywin32/&quot;, &quot;PyWin32&quot;).
+
+First, you need to install PyWin32:
+
+```
+pip3 install pywin32
+```
+
+Example code:
+
+```
+import win32com.client
+
+speaker = win32com.client.Dispatch(&quot;SAPI.SpVoice&quot;)
+speaker.Speak(&quot;Hello, world!&quot;)
+```
+
+= How to Get Danmaku
+
+Twitch&#x27;s chat system is quite interesting; they actually use an #link(&quot;https://dev.twitch.tv/docs/irc/guide#connecting-to-twitch-irc&quot;, &quot;IRC interface&quot;) for their chatbot interface.
+
+So, you can even use the `nc` command to operate it manually:
+
+```
+[mistivia@arch ~]$ nc irc.chat.twitch.tv 6667
+&lt; PASS oauth:&lt;Twitch OAuth token&gt;
+&lt; NICK &lt;user&gt;
+&gt; :tmi.twitch.tv 001 &lt;user&gt; :Welcome, GLHF!
+&gt; :tmi.twitch.tv 002 &lt;user&gt; :Your host is tmi.twitch.tv
+&gt; :tmi.twitch.tv 003 &lt;user&gt; :This server is rather new
+&gt; :tmi.twitch.tv 004 &lt;user&gt; :-
+&gt; :tmi.twitch.tv 375 &lt;user&gt; :-
+&gt; :tmi.twitch.tv 372 &lt;user&gt; :You are in a maze of twisty passages, all alike.
+&gt; :tmi.twitch.tv 376 &lt;user&gt; :&gt;
+JOIN #channel
+```
+
+Note the prompt after logging in:
+
+```
+You are in a maze of twitsy passages, all alike.
+```
+
+This is actually an Easter egg from the 1970s adventure game on the PDP-10 computer: #link(&quot;https://en.wikipedia.org/wiki/Colossal_Cave_Adventure#Maze_of_twisty_little_passages&quot;, &quot;Colossal Cave Adventure&quot;), commonly known as *Adventure*. This was the world&#x27;s first interactive fiction, as well as the first adventure game and text adventure game.
+
+This game later had a graphical adaptation on the Atari console, also called *Adventure*, which is considered the first game in history to contain an Easter egg (the one in *Ready Player One*).
+
+Since IRC is a very old and mature text protocol, development only requires using some open-source IRC libraries in Python. Twitch officially provides an #link(&quot;https://github.com/twitchdev/chatbot-python-sample&quot;, &quot;example of a chatbot implemented in Python 2&quot;). It can be used in Python 3 with a few modifications.
+
+It uses an #link(&quot;https://pypi.org/project/irc/&quot;, &quot;IRC library for Python&quot;), which needs to be installed beforehand:
+
+```
+pip3 install irc
+```
+
+Final code:
+
+```
+# Windows Only
+# Dependencies: pip install pywin32 irc
+
+import win32com.client
+import irc.bot
+
+# your username
+username = &quot;mistivia&quot;
+botname = &quot;mybot&quot;
+# channel name, prepending &#x27;#&#x27; is a must
+channel = &quot;#mistivia&quot;
+# To get a token, visit: http://twitchapps.com/tmi/
+token = &quot;oauth:YOUR TOKEN HERE&quot;
+
+server = &quot;irc.chat.twitch.tv&quot;
+port = 6667
+
+speaker = win32com.client.Dispatch(&quot;SAPI.SpVoice&quot;)
+
+class TwitchBot(irc.bot.SingleServerIRCBot):
+    def __init__(self, username, client_id, token, channel):
+        self.client_id = client_id
+        self.token = token
+        self.channel = channel
+
+        print(&#x27;Connecting to &#x27; + server + &#x27; on port &#x27; + str(port) + &#x27;...&#x27;)
+        irc.bot.SingleServerIRCBot.__init__(
+            self, [(server, port, token)], username, username)
+
+
+    def on_welcome(self, c, e):
+        print(&#x27;Joining &#x27; + self.channel)
+
+        # You must request specific capabilities before you can use them
+        c.join(self.channel)
+
+    def on_pubmsg(self, c, e):
+        self.on_msg(e.source.nick, e.arguments[0])
+
+    def on_msg(self, nick, msg):
+        print(nick + &quot;: &quot; + msg)
+        speaker.Speak(nick + &quot; says: &quot; + msg)
+
+if __name__ == &quot;__main__&quot;:
+    bot = TwitchBot(username,botname, token, channel)
+    bot.start()
+```
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2021-10-19-danmaku/index.pdf">
+        <p><a href="/enposts/2021-10-19-danmaku/index.pdf">/enposts/2021-10-19-danmaku/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

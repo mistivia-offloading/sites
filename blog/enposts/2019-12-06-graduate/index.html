@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>The Path of Pain</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// The Path of Pain
+#import &quot;/template-en.typ&quot;: doc-template
+
+#doc-template(
+title: &quot;The Path of Pain&quot;,
+date: &quot;December 6, 2019&quot;,
+body: [
+
+
+Yesterday, I finally completed the defense for my graduation thesis. The whole process was quite smooth (largely thanks to the defense committee being lenient). With this, my graduate student career has entered the countdown stage. Looking back at these two and a half years, there&#x27;s surprisingly little sense of reality, a bit like a dream.
+
+These two and a half years were by no means happy. My mental state was at a low point throughout this entire time: I, who considered myself &quot;iron-hearted,&quot; suddenly had an emotional breakdown one afternoon and wailed in an empty dormitory because I was homesick. Thinking about it, there were several reasons. First, I didn&#x27;t like the direction of my graduate studies. The lab focused on blockchain, but I wasn&#x27;t interested in it; I had written an article about this before. Second, comparing myself with my peers also made me feel somewhat uncomfortable: those who went abroad for taught master&#x27;s degrees basically maintained the same study pace as during their undergraduate years, and their job prospects were also much better. On many sleepless nights, I was in self-doubt, wondering if I had chosen the wrong path.
+
+At that time, I couldn&#x27;t have imagined my current self—graduating smoothly without major setbacks and even finding a good job. Looking back now at my once anxious and tense self, I even find it a bit laughable that I was so fragile. But my anxiety at the time was undeniably real.
+
+I recommend a game: _Celeste_. I found a bit of courage in Madeline&#x27;s story of fighting her own negative emotions; perhaps others can too.
+
+])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2019-12-06-graduate/index.pdf">
+        <p><a href="/enposts/2019-12-06-graduate/index.pdf">/enposts/2019-12-06-graduate/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+

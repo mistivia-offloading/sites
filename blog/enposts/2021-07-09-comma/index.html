@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>The Oxford Comma in Chinese</title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="/style4.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    .pdf-wrapper {
+        width: 100%;
+        height: 80vh;
+        margin-bottom: 20px;
+    }
+    .pdf-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+    }
+</style>
+</head>
+<body>
+<div style="padding:0px 5px;">
+<pre class="back"><a href="../">../</a></pre>
+</div>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">// The Oxford Comma in Chinese
+#import &quot;/template-en.typ&quot;:*
+
+#doc-template(
+  title: &quot;The Oxford Comma in Chinese&quot;,
+  date: &quot;July 9, 2021&quot;,
+  body: [
+
+    In English, if you are listing a series of things, it is usually written like this:
+
+        A, B and C
+
+    Where there is no punctuation before the last &quot;and.&quot; Sometimes this can cause ambiguity, so it is also written like this:
+
+        A, B, and C
+
+    The comma before &quot;and&quot; here is called the &quot;#link(&quot;https://en.wikipedia.org/wiki/Serial_comma&quot;, &quot;serial comma&quot;)&quot; or the &quot;Oxford comma.&quot;
+
+    In British English, it&#x27;s optional to add it, while in American English, it&#x27;s generally included. The famous *The Elements of Style* recommends adding the Oxford comma because it can often eliminate ambiguity.
+
+    There is a similar issue in Chinese. When listing things, it is often written like this:
+
+    #myquote[
+        A、B 和 C
+    ]
+
+    There are two ways to solve this. The first is to simply use the dun-comma (enumeration comma) throughout:
+
+    #myquote[
+        A、B、C
+    ]
+
+    Additionally, there is a usage similar to the Oxford comma. According to &quot;GB/T 15834—2011 General Rules for Punctuation&quot;:
+
+    #pagebreak()
+
+    #myquote[
+        When a dun-comma is used to represent a pause between long, numerous, or complex parallel components, the last component can be connected with &quot;yǐjí (and)&quot; or &quot;jí (and).&quot; A comma should be used before &quot;yǐjí (and)&quot; or &quot;jí (and).&quot;
+        Example: Yālì guò dà (excessive pressure), gōngzuò shíjiān guò zhǎng (excessively long working hours), zuòxī bù guīlǜ (irregular routine), yǐjí (and) hūshì yíngyǎng jūnhéng děng (neglecting nutritional balance, etc.), jūn huì dǎozhì jiànkāng zhuàngkuàng de xiàjiàng (will all lead to a decline in health status).
+    ]
+
+  ])
+</pre>
+<div class="pdf-wrapper">
+    <iframe src="/pdfjs/web/viewer.html?file=/enposts/2021-07-09-comma/index.pdf">
+        <p><a href="/enposts/2021-07-09-comma/index.pdf">/enposts/2021-07-09-comma/index.pdf</a></p>
+    </iframe>
+</div>
+<div style="padding:0px 5px;">
+<hr>
+<p id="email">Email: i (at) mistivia (dot) com</p>
+</div>
+<script>
+var emailElement = document.getElementById('email');
+var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
+var decodedString = atob(base64String);
+emailElement.innerHTML = decodedString;
+</script>
+</body>
+<script>
+var max = function(x, y) {return x < y ? y : x};
+var seth;
+seth = function() {document.getElementsByClassName('pdf-wrapper')[0].style.height = max(500, document.getElementsByTagName('iframe')[0].contentDocument.getElementById('viewer').scrollHeight) + 80 + 'px'; setTimeout(seth, 1000);}
+setTimeout(seth, 1000);
+</script>
+</html>
+
