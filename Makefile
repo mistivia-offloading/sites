@@ -4,7 +4,7 @@ MD_TARGET  = $(MD_SRC:.md=.html)
 TEX_SRC  = $(shell find . -name '*.tex' -not -path './templates/*')
 TEX_PDF_TARGET  = $(TEX_SRC:.tex=.pdf)
 
-TYP_SRC  = $(shell find . -name '*.typ' -not -path './templates/*')
+TYP_SRC  = $(shell find . -name '*.typ' -not -path './template.typ' -not -path './template-en.typ')
 TYP_PDF_TARGET  = $(TYP_SRC:.typ=.pdf)
 
 PDF_SRC = $(TYP_PDF_TARGET) $(TEX_PDF_TARGET)

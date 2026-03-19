@@ -28,24 +28,6 @@ if [ "$typ_in_rel" = "$typ_in_abs" ]; then
   exit 1
 fi
 
-created_links=()
-cleanup() {
-  for p in "${created_links[@]}"; do
-    rm -f "$p"
-  done
-}
-trap cleanup EXIT
-
-for name in template.typ template-en.typ; do
-  target="$project_root/$name"
-  source_file="$templates_dir/$name"
-  if [ -e "$target" ]; then
-    continue
-  fi
-  ln -s "$source_file" "$target"
-  created_links+=("$target")
-done
-
 echo "Compiling '$typ_in_abs' -> '$pdf_out'"
 echo "Using typst root '$project_root'"
 
