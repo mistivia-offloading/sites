@@ -10,6 +10,8 @@
 <body>
 
 <h1>Mistivia</h1>
+
+<div id="ennav" style="display: none;">
 <ul>
 <li><a href="https://blog.mistivia.com/">Blog</a></li>
 <li><a href="https://raye.mistivia.com/fedi/mistivia">Social Media</a></li>
@@ -17,12 +19,31 @@
 <li><a href="./yggdrasil/">Yggdrasil</a></li>
 <li><a href="https://raye.mistivia.com/notes">Notes</a></li>
 <li><a href="https://mistivia.com/chat">IRC Chatroom</a></li>
-<li><a href="https://github.com/mistivia?tab=repositories&q=&type=source&language=&sort=stargazers">Projects</a></li>
+<li><a href="https://github.com/mistivia?tab=repositories&q=&type=source&language=&sort=stargazers">Side Projects</a></li>
 </ul>
+</div>
+
+<div id="zhnav">
+<ul>
+<li><a href="https://blog.mistivia.com/">博客</a></li>
+<li><a href="https://raye.mistivia.com/fedi/mistivia">联邦宇宙</a></li>
+<li><a href="https://raye.mistivia.com/gallery/">摄影</a></li>
+<li><a href="./yggdrasil/">世界树网络</a></li>
+<li><a href="https://raye.mistivia.com/notes">笔记</a></li>
+<li><a href="https://mistivia.com/chat">IRC聊天室</a></li>
+<li><a href="https://github.com/mistivia?tab=repositories&q=&type=source&language=&sort=stargazers">业余项目</a></li>
+</ul>
+</div>
 
 <hr>
 <p id="email">Email: i (at) mistivia (dot) com</p>
 <script>
+var userLang = navigator.language || navigator.userLanguage;
+if (!userLang.startsWith('zh')) {
+    document.getElementById('zhnav').style.display = 'none';
+    document.getElementById('ennav').style.display = 'block';
+}
+
 var emailElement = document.getElementById('email');
 var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
 var decodedString = atob(base64String);
