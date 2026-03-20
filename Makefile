@@ -12,6 +12,9 @@ PDF_HTML_TARGET = $(PDF_SRC:.pdf=.html)
 
 all: rss $(MD_TARGET) $(PDF_HTML_TARGET)
 
+clean:
+	-rm $(PDF_HTML_TARGET) $(MD_TARGET)
+
 rss: blog/index.xml blog/enposts/index.xml
 
 blog/index.xml: blog/posts/index.md scripts/genrss.py
@@ -32,4 +35,4 @@ $(TEX_PDF_TARGET): %.pdf: %.tex
 $(PDF_HTML_TARGET): %.html: %.pdf scripts/pdf2html.py
 	python scripts/pdf2html.py $< > $@
 
-.PHONY: rss
+.PHONY: rss clean
