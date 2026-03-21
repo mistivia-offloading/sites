@@ -1,6 +1,7 @@
 #!/bin/sh
 
 make
+python3 scripts/sitemap.py
 git add *
 git commit -am "update"
 proxychains -q git push
