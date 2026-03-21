@@ -5,13 +5,15 @@
 ) = [
     #show link: underline
     #show raw.where(block: true): block.with(
-        // fill: luma(240),
-        inset: (left: 2.5em, top: 1em, bottom: 1em),
+        inset: (left: 24pt, top: 0em, bottom: 0em),
         width: 100%
     )
     #show raw: set text(font: (
         "Sarasa Mono SC"
     ))
+    #show raw.where(block: true): set text(
+        size: 0.9em,
+    )
     #set text(font: (
         "Libertinus Serif",
     ))
@@ -32,9 +34,9 @@
         leading: 0.8em,
         spacing: 0.8em,
     )
-    #set list(indent: 2em)
-    #set enum(indent: 2em)
-    #set terms(indent: 2em)
+    #set list(indent: 23pt)
+    #set enum(indent: 23pt)
+    #set terms(indent: 23pt)
     #show heading: it =>  {
         par(leading:0pt,spacing:0pt)[#text(size:0pt)[]]
         it

@@ -26,7 +26,7 @@ blog/enposts/index.xml: blog/enposts/index.md scripts/genrss.py
 $(MD_TARGET): %.html: %.md scripts/md.py
 	python scripts/md.py $< > $@
 
-$(TYP_PDF_TARGET): %.pdf: %.typ
+$(TYP_PDF_TARGET): %.pdf: %.typ template.typ template-en.typ
 	bash scripts/typ2pdf.sh $<
 
 $(TEX_PDF_TARGET): %.pdf: %.tex
