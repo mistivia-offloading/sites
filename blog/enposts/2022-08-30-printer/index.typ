@@ -57,25 +57,25 @@ crw-rw---- 1 root root 180, 0 Aug 29 05:16 lp0
 
 Then change the owner of this device to yourself:
 
-```
+```bash
 sudo chown $USER:$USER /dev/usb/lp0
 ```
 
 You can start printing by inputting text into this character device:
 
-```
+```bash
 echo "The quick brown fox jumps over the lazy dog." > /dev/usb/lp0
 ```
 
 If you need to input Chinese, please note that most thermal printers in China only support the GBK character set, and encoding conversion is required:
 
-```
+```bash
 echo "I can swallow glass, it does not hurt me." | iconv -i utf-8 -t gbk > /dev/usb/lp0
 ```
 
 After the operating system restarts, the owner of the device will revert to root, so you need to modify the udev configuration:
 
-```
+```bash
 echo -e KERNEL=="lp0", \SUBSYSTEM=="usbmisc", \ACTION=="add", \OWNER=="$USER", \
 GROUP=="$USER" \ | sudo tee -a /etc/udev/rules.d/99-perm.rules
 ```
@@ -86,7 +86,7 @@ Writing a Telegram bot is easiest with Python!
 
 First, download the Telegram bot library:
 
-```
+```bash
 sudo pip3 install python-telegram-bot
 ```
 
@@ -94,7 +94,7 @@ Actually, tools like `virtualenv` should be used, but I installed it globally he
 
 Then the code:
 
-```
+```py
 # The token needs to be changed to the one you applied for previously
 TOKEN='xxxxxx'
 
@@ -165,7 +165,7 @@ $ sudo apt-get install proxychains-ng
 
 Then modify the configuration file `/etc/proxychains.conf`, adding your proxy address and port in the ProxyList section. For example, socks5 usually uses port 1080 of localhost:
 
-```
+```ini
 [ProxyList]
 # add proxy here ...
 socks5  127.0.0.1 1080
@@ -173,7 +173,7 @@ socks5  127.0.0.1 1080
 
 Finally, run the bot:
 
-```
+```bash
 proxychains -q python3 bot.py
 ```
 

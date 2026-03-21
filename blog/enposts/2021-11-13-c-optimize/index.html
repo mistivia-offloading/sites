@@ -61,7 +61,7 @@ Regarding how to optimize programs, there are some common-sense clichés that ap
 
 One is the likely/unlikely macros, which depend on the `__builtin_expect` function in GCC. As follows:
 
-```
+```cpp
 #define likely(x)       __builtin_expect((x),1)
 #define unlikely(x)     __builtin_expect((x),0)
 ```
@@ -70,7 +70,7 @@ This macro can tell the compiler which branch is more likely to be taken. Based 
 
 Starting from C++20, likely and unlikely have entered the C++ standard in the form of attributes. The usage is as follows:
 
-```
+```cpp
 double pow(double x, long long n) {
     if (n &gt; 0) [[likely]]
         return x * pow(x, n - 1);

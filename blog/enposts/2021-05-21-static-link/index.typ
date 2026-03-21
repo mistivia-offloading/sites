@@ -10,7 +10,7 @@ Go and Rust have a very useful feature: binary deployment. However, on Linux, th
 
 = Go
 
-```
+```bash
 go build -tags netgo -ldflags '-extldflags "-static"'
 ```
 
@@ -18,7 +18,7 @@ go build -tags netgo -ldflags '-extldflags "-static"'
 
 Regarding Rust, I encountered some strange issues while trying to statically link glibc, and I couldn't solve them after searching StackOverflow for a long time. So I decided to switch to using musl. For example, on Arch Linux, it's done like this:
 
-```
+```bash
 sudo pacman -S musl
 rustup target add x86_64-unknown-linux-musl
 cargo build --release --target x86_64-unknown-linux-musl

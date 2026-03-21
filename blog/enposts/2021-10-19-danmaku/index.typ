@@ -16,13 +16,13 @@ This interface can be called using #link("https://pypi.org/project/pywin32/", "P
 
 First, you need to install PyWin32:
 
-```
+```bash
 pip3 install pywin32
 ```
 
 Example code:
 
-```
+```py
 import win32com.client
 
 speaker = win32com.client.Dispatch("SAPI.SpVoice")
@@ -63,13 +63,13 @@ Since IRC is a very old and mature text protocol, development only requires usin
 
 It uses an #link("https://pypi.org/project/irc/", "IRC library for Python"), which needs to be installed beforehand:
 
-```
+```bash
 pip3 install irc
 ```
 
 Final code:
 
-```
+```py
 # Windows Only
 # Dependencies: pip install pywin32 irc
 

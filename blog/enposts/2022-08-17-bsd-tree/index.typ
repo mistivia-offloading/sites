@@ -14,13 +14,13 @@ This implementation is header-only, has no external dependencies, and is generic
 
 Run:
 
-```
+```bash
 curl https://raw.githubusercontent.com/openbsd/src/master/sys/sys/tree.h -o tree.h
 ```
 
 This header file includes `sys/_null.h`, which does not exist on Linux. However, `tree.h` only uses this file to define `NULL`, so you can just change it to `stdlib.h`.
 
-```
+```c
 // #include <sys/_null.h>
 #include <stdlib.h>
 ```
@@ -29,7 +29,7 @@ This header file includes `sys/_null.h`, which does not exist on Linux. However,
 
 The trees in the `tree.h` header file are actually entirely macros, so they need to be expanded before use. For example, if you want the value type in the tree to be `double`, create a new header file `double_tree.h` and declare it like this:
 
-```
+```c
 #ifndef DOUBLE_TREE_H_
 #define DOUBLE_TREE_H_
 
@@ -52,7 +52,7 @@ RB_PROTOTYPE(double_tree, double_treenode, entry, double_cmp)
 
 Then create the source file `double_tree.h` and add the necessary function definitions:
 
-```
+```c
 #include "double_tree.h"
 
 int double_cmp(struct double_treenode *e1, struct double_treenode *e2); {
@@ -75,20 +75,20 @@ Next, we will introduce how to use this `double_tree`.
 
 Create the tree and initialize it:
 
-```
+```c
 RB_HEAD(double_tree, double_treenode) head;
 RB_INIT(&head);
 ```
 
 Initialization can also be completed in one line:
 
-```
+```c
 RB_HEAD(double_tree, double_treenode) head = RB_INITIALIZER(&head);
 ```
 
 == Insertion
 
-```
+```c
 struct double_treenode *n;
 double data[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
 for (int i = 0; i < 5; i++) {
@@ -100,7 +100,7 @@ for (int i = 0; i < 5; i++) {
 
 == Search and Deletion
 
-```
+```c
 struct double_treenode find;
 find.val = 3.0
 
@@ -116,7 +116,7 @@ if (iter != NULL) {
 
 == Traversal
 
-```
+```c
 RB_FOREACH(iter, double_tree, &head) {
     // Do something on iter->val
     ...
@@ -125,7 +125,7 @@ RB_FOREACH(iter, double_tree, &head) {
 
 In fact, `RB_FOREACH(iter, double_tree, &head)` is essentially:
 
-```
+```c
 for (iter = RB_MIN(double_tree, &head);
         iter != NULL;
         iter = RB_NEXT(double_tree, &head, iter))
@@ -135,7 +135,7 @@ You can use `RB_MIN` to get the minimum node in the tree; use `RB_NEXT` to get t
 
 If you want to traverse the tree in other orders, you can use `RB_LEFT` and `RB_RIGHT`. For example, printing the tree using pre-order traversal:
 
-```
+```c
 void
 print_tree(struct double_treenode *n)
 {

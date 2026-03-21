@@ -7,14 +7,14 @@ body: [
 
 A Monitor is one of the synchronization mechanisms for concurrent programs. There are at least two types of Monitors: Mesa monitor and Hoare monitor. A Mesa monitor continues running after a `notify`, whereas a Hoare monitor performs a context switch after a `notify`, moving to the place where `wait` was called and starting execution there. Therefore, when writing a `wait`, a Mesa monitor requires this:
 
-```
+```cpp
 while (locked)
     wait();
 ```
 
 But a Hoare Monitor only needs this:
 
-```
+```cpp
 if (locked)
     wait();
 ```
@@ -23,7 +23,7 @@ Currently, the Mesa Monitor is the most common.
 
 Implementing a monitor requires language-level support. Java has the `synchronized` keyword, which can be used to implement a monitor, but C++ does not. However, we can still use condition variables and RAII to simulate a Mesa monitor.
 
-```
+```cpp
 #include <mutex>
 #include <condition_variable>
 
@@ -47,7 +47,7 @@ private:
 
 Let's look at a simple example: implementing a mutex lock using a monitor. Although this example has no practical significance, it is simple enough:
 
-```
+```cpp
 // To compile: g++ -std=c++14 -lpthread MonitorLock.cpp
         
 #include "Monitor.h"
@@ -99,7 +99,7 @@ int main()
 
 Another example is slightly more practical: solving the Producer-Consumer problem.
 
-```
+```cpp
 // To compile: g++ -std=c++14 -lpthread ProducerConsumer.cpp
         
 #include "Monitor.h"
@@ -159,7 +159,7 @@ int main()
 
 The above example only applies to the single-producer single-consumer problem. To solve the multi-producer multi-consumer problem, one approach is to set a threshold:
 
-```
+```cpp
 // insert()
 if (items.size() >= comsumerThreshold)
         m.broadcast();
@@ -170,7 +170,7 @@ if(items.size() <= producerThreshold)
 
 Or control the use of condition variables with finer granularity:
 
-```
+```cpp
 // To compile: g++ -std=c++14 -lpthread ProducerConsumer.cpp
         
 #include <thread>

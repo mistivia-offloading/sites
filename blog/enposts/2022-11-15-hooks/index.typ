@@ -10,7 +10,7 @@ Hooking is a common technique in game cheat development: by placing a small piec
 
 For example, take the following code:
 
-```
+```c
 #include <stdio.h>
 
 int func()
@@ -29,7 +29,7 @@ While it would be easy to modify the `func` function directly here, assume that 
 
 Taking x64 Linux as an example, code typically resides in the `.text` segment, where memory is non-writable. Therefore, we use the `mprotect` function to modify the memory attributes to allow writing:
 
-```
+```c
 #include <unistd.h>
 #include <sys/mman.h>
 
@@ -46,7 +46,7 @@ if (mprotect(aligned_addr,
 
 Then, write the jump machine code. Its assembly pseudo-code is as follows:
 
-```
+```asm
 mov rax, &hook_func
 jmp rax
 ```
@@ -55,7 +55,7 @@ Since the `rax` register is used to store the return value in the C/C++ ABI and 
 
 The actual implementation would look like this:
 
-```
+```c
 uint8_t hook_mcode[] = {0x48, 0xB8, 0x00, 0x00, 0x00, 0x00,
                         0x00, 0x00, 0x00, 0x00, 0xFF, 0xE0};
 *(uintptr_t*)(hook_code + 2) = (uintptr_t)hook_func;
@@ -64,7 +64,7 @@ memcpy(orig_func, hook_mcode, 12);
 
 Finally, we have the complete code:
 
-```
+```c
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

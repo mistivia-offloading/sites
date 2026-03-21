@@ -35,19 +35,19 @@ body: [
 
 If you want to load subtitles for a video, it is actually most convenient to load a text-format subtitle track or subtitle file separately. However, if the video is to be uploaded to some websites or viewed on mobile devices, you may need to burn the subtitles into the video. FFmpeg provides a command:
 
-```
+```bash
 ffmpeg -i input.mp4 -vf &quot;ass=subtitle.ass&quot; output.mp4
 ```
 
 Some subtitles are in `*.srt` format, in which case they need to be transcoded to `*.ass` format first:
 
-```
+```bash
 ffmpeg -i input.srt output.ass
 ```
 
 If the subtitle is a subtitle track in an MKV file, it needs to be extracted first:
 
-```
+```bash
 ffmpeg -i Movie.mkv -map 0:s:0 subs.srt
 ```
 
@@ -67,7 +67,7 @@ file track-XX.mp3
 
 Assuming the above file is saved as `list.txt`, then run this command:
 
-```
+```bash
 ffmpeg -f concat -safe 0 -i list.txt -c copy output.mp3
 ```
 
@@ -75,7 +75,7 @@ ffmpeg -f concat -safe 0 -i list.txt -c copy output.mp3
 
 You can actually use FFmpeg to convert video directly to GIF:
 
-```
+```bash
 ffmpeg -i input.mp4 output.gif
 ```
 
@@ -85,13 +85,13 @@ Since GIF only has a limited number of colors to choose from, there will inevita
 
 However, although theoretically speaking, the quantization error is reduced, it actually looks uncomfortable to the human eye, so it is best to turn off dither. But in this case, the steps are a bit more complicated. First, generate a GIF palette:
 
-```
+```bash
 ffmpeg -i input.mp4 -vf palettegen palette.png
 ```
 
 Then, combine the palette file and start transcoding with dither disabled:
 
-```
+```bash
 ffmpeg -i input.mp4 -i palette.png \
     -filter_complex &quot;paletteuse=dither=none&quot; output.gif
 ```
