@@ -92,7 +92,7 @@ def build_html(svg_contents: list[str], title: str, srctext: str = "") -> str:
 <div class="ipadding">
 <pre class="back"><a href="../">../</a></pre>
 </div>
-<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">{srctext[:800] + '（后面内容省略，只以图片形式提供）'}</pre>
+<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">{srctext[:500] + '\n\n...'}</pre>
 <div class="content">
 {pages_html}
 </div>

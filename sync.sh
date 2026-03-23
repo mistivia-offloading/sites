@@ -2,11 +2,13 @@
 
 make
 python3 scripts/sitemap.py
+
+sed -i 's#href="../"#href="https://mistivia.com"#g' blog/index.html
+
 git add *
 git commit -am "update"
 proxychains -q git push
 
-sed -i 's#href="../"#href="https://mistivia.com"#g' blog/index.html
 cp homepage/style*.css blog/
 cp homepage/style*.css /var/ygg/web/
 
