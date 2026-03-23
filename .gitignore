@@ -1,0 +1,11 @@
+blog/pdfjs/
+*.pdf
+.bashrc
+.inputrc
+.Xauthority
+index.log
+templates/*.log
+scripts/__pycache__/
+task.md
+blog/posts/*/*.html
+*.typ

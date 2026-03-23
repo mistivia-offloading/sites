@@ -1,0 +1,34 @@
+MD_SRC  = $(shell find . -name "*.md" -not -path './task.md')
+MD_TARGET  = $(MD_SRC:.md=.html)
+
+TYP_SRC  = $(shell find . -name '*.typ' -not -path './template.typ' -not -path './template-en.typ')
+TYP_HTML_TARGET  = $(TYP_SRC:.typ=.html)
+TYP_GPG_TARGET  = $(TYP_SRC:.typ=.typ.gpg)
+
+all: rss $(MD_TARGET) $(TYP_HTML_TARGET) $(TYP_GPG_TARGET)
+
+clean:
+	-rm $(TYP_HTML_TARGET) $(MD_TARGET)
+
+rss: blog/index.xml
+
+blog/index.xml: blog/index.md scripts/genrss.py
+	sed -n '6,13p' $< | python scripts/genrss.py > $@
+
+$(MD_TARGET): %.html: %.md scripts/md.py
+	python scripts/md.py $< > $@
+
+$(TYP_HTML_TARGET): %.html: %.typ template.typ template-en.typ scripts/typ2html.py
+	python scripts/typ2html.py $< > $@
+
+$(TYP_GPG_TARGET): %.typ.gpg: %.typ
+	gpg --batch --yes --passphrase "blog.mistivia.com" --cipher-algo AES256 --symmetric -o $@ $<
+
+decrypt:
+	@for f in $$(find . -name "*.typ.gpg"); do \
+		output=$${f%.gpg}; \
+		echo "Decrypting $$f -> $$output"; \
+		gpg --batch --yes --passphrase "blog.mistivia.com" -d -o $$output $$f; \
+	done
+
+.PHONY: rss clean decrypt
