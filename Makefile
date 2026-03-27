@@ -19,7 +19,7 @@ $(MD_TARGET): %.html: %.md scripts/md.py
 	python scripts/md.py $< > $@
 
 $(TYP_HTML_TARGET): %.html: %.typ template.typ template-en.typ scripts/typ2html.py
-	python scripts/typ2html.py $< > $@
+	python scripts/typ2html.py $< $@
 
 $(TYP_GPG_TARGET): %.typ.gpg: %.typ
 	gpg --batch --yes --passphrase "blog.mistivia.com" --cipher-algo AES256 --symmetric -o $@ $<

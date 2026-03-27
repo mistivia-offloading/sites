@@ -9,3 +9,4 @@ scripts/__pycache__/
 task.md
 blog/posts/*/*.html
 *.typ
+*.svg

@@ -2,9 +2,10 @@
 import html
 import sys
 import subprocess
-import tempfile
 import os
 import glob
+import shutil
+import tempfile
 from pathlib import Path
 
 CSS_STYLES = """
@@ -28,9 +29,9 @@ def extract_title(src_path: Path) -> str:
         return line.lstrip("%").strip() or src_path.stem
     return src_path.stem
 
-def compile_typ_to_svgs(typ_path: Path, project_root: Path) -> list[Path]:
-    """Compile typst file to multiple SVG files in a temp directory"""
-    # Create temp directory for SVG output
+def compile_typ_to_svgs(typ_path: Path, project_root: Path, output_dir: Path, base_name: str) -> list[str]:
+    """Compile typst file to multiple SVG files in the output directory"""
+    # Create temp directory for SVG output first
     with tempfile.TemporaryDirectory() as tmpdir:
         # Calculate relative path from project root
         try:
@@ -60,27 +61,29 @@ def compile_typ_to_svgs(typ_path: Path, project_root: Path) -> list[Path]:
             print("Error: No SVG files generated", file=sys.stderr)
             raise SystemExit(1)
         
-        # Read SVG contents and return
-        svg_contents = []
-        for svg_file in svg_files:
-            with open(svg_file, 'r', encoding='utf-8') as f:
-                svg_contents.append(f.read())
+        # Move SVG files to output directory with proper naming
+        svg_names = []
+        for i, svg_file in enumerate(svg_files, 1):
+            # Name: base-01.svg, base-02.svg, etc.
+            svg_name = f"{base_name}-{i:02d}.svg"
+            svg_path = output_dir / svg_name
+            shutil.copy2(svg_file, svg_path)
+            svg_names.append(svg_name)
         
-        return svg_contents
+        return svg_names
 
-def build_html(svg_contents: list[str], title: str, srctext: str = "") -> str:
-    """Build HTML with inline SVGs"""
-    # Wrap each SVG in a page div
+def build_html(svg_names: list[str], title: str, srctext: str = "") -> str:
+    """Build HTML with object tags referencing SVG files"""
+    # Wrap each SVG object in a page div
     page_divs = []
-    for svg in svg_contents:
-        # Remove XML declaration if present
-        if svg.startswith('<?xml'):
-            svg = svg[svg.find('?>')+2:].strip()
-        page_divs.append(f'<div class="ipadding"><div class="page">\n{svg}\n</div></div>')
+    for svg_name in svg_names:
+        page_divs.append(f'''<div class="ipadding"><div class="page">
+<object data="{svg_name}" type="image/svg+xml" style="width:100%;height:auto;display:block;"></object>
+</div></div>''')
     
     pages_html = '\n'.join(page_divs)
     
-    return f"""<!DOCTYPE html>
+    return f'''<!DOCTYPE html>
 <html>
 <head>
 <title>{title}</title>
@@ -108,14 +111,16 @@ emailElement.innerHTML = decodedString;
 </script>
 </body>
 </html>
-"""
+'''
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print("Usage: python scripts/typ2html.py <path/to/file.typ>", file=sys.stderr)
+    if len(sys.argv) != 3:
+        print("Usage: python scripts/typ2html.py <path/to/file.typ> <path/to/output.html>", file=sys.stderr)
         return 1
 
     typ_path = Path(sys.argv[1])
+    html_path = Path(sys.argv[2])
+    
     if typ_path.suffix.lower() != ".typ":
         print(f"error: input is not a typst file: {typ_path}", file=sys.stderr)
         return 1
@@ -126,17 +131,29 @@ def main() -> int:
 
     project_root = get_project_root()
     
+    # Ensure output directory exists
+    html_path.parent.mkdir(parents=True, exist_ok=True)
+    output_dir = html_path.parent
+    
+    # Use HTML stem as base name for SVG files
+    base_name = html_path.stem
+    
     # Extract title and source text
     title = extract_title(typ_path)
     src_text = typ_path.read_text(encoding="utf-8")
     src_text_escaped = html.escape(src_text)
     
-    # Compile to SVGs
-    svg_contents = compile_typ_to_svgs(typ_path, project_root)
+    # Compile to SVGs (saved to output directory)
+    svg_names = compile_typ_to_svgs(typ_path, project_root, output_dir, base_name)
     
-    # Build and output HTML
-    html_output = build_html(svg_contents, title, src_text_escaped)
-    print(html_output)
+    # Build HTML
+    html_output = build_html(svg_names, title, src_text_escaped)
+    
+    # Write HTML to file
+    html_path.write_text(html_output, encoding="utf-8")
+    print(f"Generated {html_path}")
+    for svg_name in svg_names:
+        print(f"  with {svg_name}")
     
     return 0
 
