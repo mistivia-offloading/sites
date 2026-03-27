@@ -69,7 +69,7 @@ def compile_typ_to_svgs(typ_path: Path, project_root: Path, output_dir: Path, ba
             svg_path = output_dir / svg_name
             # Read SVG content, process xlink:href links, then write
             svg_content = Path(svg_file).read_text(encoding="utf-8")
-            svg_content = svg_content.replace('xlink:href="http', 'target="_blank" xlink:href="http')
+            svg_content = svg_content.replace('xlink:href="http', 'target="_top" xlink:href="http')
             svg_path.write_text(svg_content, encoding="utf-8")
             svg_names.append(svg_name)
         
