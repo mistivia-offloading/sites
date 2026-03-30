@@ -3,6 +3,7 @@ Scriptum Mistiviae
 
 [[RSS](index.xml)] [[友链](links/)]
 
+- 2026-03-30 [Functional Programming或许也可以翻译成“泛函”编程](/posts/2026-03-30-functional/)
 - 2026-02-02 [写一个虚拟机管理器](/posts/2026-02-02-vmm/)
 - 2026-01-14 [西北之行](/posts/2026-01-14-nwtravel/)
 - 2026-01-12 [专治各种游戏联机疑难杂症](/posts/2026-01-12-full-cone-nat/)

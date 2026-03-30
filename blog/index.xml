@@ -8,6 +8,14 @@
     <generator>Python Plain String RSS Generator</generator>
 
     <item>
+      <title>Functional Programming或许也可以翻译成“泛函”编程</title>
+      <link>https://blog.mistivia.com/posts/2026-03-30-functional/</link>
+      <description>Link to the post: https://blog.mistivia.com/posts/2026-03-30-functional/</description>
+      <guid>https://blog.mistivia.com/posts/2026-03-30-functional/</guid>
+      <pubDate>Mon, 30 Mar 2026 00:00:00 GMT</pubDate>
+    </item>
+
+    <item>
       <title>写一个虚拟机管理器</title>
       <link>https://blog.mistivia.com/posts/2026-02-02-vmm/</link>
       <description>Link to the post: https://blog.mistivia.com/posts/2026-02-02-vmm/</description>
@@ -61,14 +69,6 @@
       <description>Link to the post: https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</description>
       <guid>https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</guid>
       <pubDate>Sat, 31 May 2025 00:00:00 GMT</pubDate>
-    </item>
-
-    <item>
-      <title>类型级编程：一个最平凡的例子</title>
-      <link>https://blog.mistivia.com/posts/2025-05-17-singleton-types/</link>
-      <description>Link to the post: https://blog.mistivia.com/posts/2025-05-17-singleton-types/</description>
-      <guid>https://blog.mistivia.com/posts/2025-05-17-singleton-types/</guid>
-      <pubDate>Sat, 17 May 2025 00:00:00 GMT</pubDate>
     </item>
 
   </channel>
