@@ -112,6 +112,15 @@ var base64String = "RW1haWw6IGlAbWlzdGl2aWEuY29tCg==";
 var decodedString = atob(base64String);
 emailElement.innerHTML = decodedString;
 </script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-DRZ9ESWCVM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DRZ9ESWCVM');
+</script>
 </body>
 </html>
 '''
