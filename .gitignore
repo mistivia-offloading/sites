@@ -8,5 +8,5 @@ templates/*.log
 scripts/__pycache__/
 task.md
 blog/posts/*/*.html
-*.typ
+blog/posts/*/*.typ
 *.svg
