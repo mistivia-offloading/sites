@@ -93,6 +93,7 @@ def build_html(svg_names: list[str], title: str, srctext: str = "") -> str:
 <meta charset="utf-8">
 <link rel="stylesheet" href="/style5.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Type: Blog Article, Author: Mistivia, Title: {title}">
 </head>
 <body>
 <div class="ipadding">
