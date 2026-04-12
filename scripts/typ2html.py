@@ -98,7 +98,9 @@ def build_html(svg_names: list[str], title: str, srctext: str = "") -> str:
 <div class="ipadding">
 <pre class="back"><a href="../">../</a></pre>
 </div>
-<pre style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">{srctext[:500] + '\n\n...'}</pre>
+<p style="position:absolute;left:-10000px;top:-10000px;opacity:0;width:1px;height:1px;overflow:hidden;">
+    {srctext[:500].replace('\n', '<br>').replace(' ', '&#32;') + '<br><br>...'}
+</p>
 <div class="content">
 {pages_html}
 </div>
