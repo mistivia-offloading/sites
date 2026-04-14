@@ -55,22 +55,6 @@
       <pubDate>Thu, 17 Jul 2025 00:00:00 GMT</pubDate>
     </item>
 
-    <item>
-      <title>如何使用新闻组</title>
-      <link>https://blog.mistivia.com/posts/2025-06-04-newsgroup/</link>
-      <description>Link to the post: https://blog.mistivia.com/posts/2025-06-04-newsgroup/</description>
-      <guid>https://blog.mistivia.com/posts/2025-06-04-newsgroup/</guid>
-      <pubDate>Wed, 04 Jun 2025 00:00:00 GMT</pubDate>
-    </item>
-
-    <item>
-      <title>像Rust一样使用Haskell</title>
-      <link>https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</link>
-      <description>Link to the post: https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</description>
-      <guid>https://blog.mistivia.com/posts/2025-05-31-linear-haskell/</guid>
-      <pubDate>Sat, 31 May 2025 00:00:00 GMT</pubDate>
-    </item>
-
   </channel>
 </rss>
 

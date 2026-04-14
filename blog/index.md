@@ -13,6 +13,7 @@ Scriptum Mistiviae
 - 2025-05-31 [像Rust一样使用Haskell](/posts/2025-05-31-linear-haskell/)
 - 2025-05-17 [类型级编程：一个最平凡的例子](/posts/2025-05-17-singleton-types/)
 - 2025-05-16 [如何制作出极小的超轻量Docker镜像](/posts/2025-05-16-min-docker-image/)
+- 2025-03-29 [Rank-N类型的简单例子](/posts/2025-03-29-rankn-types/)
 - 2025-03-28 [从Hello World到IO Monad](/posts/2025-03-28-iomonad/)
 - 2024-09-21 [笨方法写Quine](/posts/2024-09-21-quine/)
 - 2024-08-03 [Emacs手札](/posts/2024-08-03-emacs/)
