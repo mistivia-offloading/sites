@@ -20,6 +20,7 @@ Scriptum Mistiviae
 - 2024-03-24 [基于Debian 12的IPv4/IPv6双栈软路由](/posts/2024-03-24-router/)
 - 2024-03-17 [一些编写Makefile的常用套路](/posts/2024-03-17-makefile/)
 - 2024-02-17 [成功上手Racket](/posts/2024-02-17-racket/)
+- 2024-02-16 [R5RS速查表](/posts/2024-02-16-r5rs-cheatsheet/)
 - 2024-01-28 [没有公网IP也可以当BT赛博菩萨](/posts/2024-01-28-bt/)
 - 2024-01-27 [udp2raw + Wiregurad组建虚拟专网](/posts/2024-01-27-udp2raw/)
 - 2023-10-06 [qemu-kvm使用笔记](/posts/2023-10-06-kvm/)

@@ -181,6 +181,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://blog.mistivia.com/posts/2024-02-16-r5rs-cheatsheet/</loc>
+    <lastmod>2024-02-16</lastmod>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://blog.mistivia.com/posts/2024-02-17-racket/</loc>
     <lastmod>2024-02-17</lastmod>
     <priority>0.6</priority>
