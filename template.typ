@@ -48,11 +48,22 @@
         it
         par(leading:0pt,spacing:0pt)[#text(size:0pt)[]]
     }
+
+    #let list-depth = state("list-depth", 0)
     #show list: it => {
-        par(leading:0pt,spacing:0pt)[#text(size:0pt)[]]
-        it
-        par(leading:0pt,spacing:0pt)[#text(size:0pt)[]]
+        list-depth.update(d => d + 1)
+        context {
+            if list-depth.get() == 1 {
+                par(leading: 0pt, spacing: 0pt)[#text(size: 0pt)[]]
+                it
+                par(leading: 0pt, spacing: 0pt)[#text(size: 0pt)[]]
+            } else {
+                it
+            }
+        }
+        list-depth.update(d => d - 1)
     }
+    
     #show raw.where(block: true): it => {
         par(leading:0pt,spacing:0pt)[#text(size:0pt)[]]
         it

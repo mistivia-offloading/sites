@@ -15,6 +15,7 @@ Scriptum Mistiviae
 - 2025-05-16 [如何制作出极小的超轻量Docker镜像](/posts/2025-05-16-min-docker-image/)
 - 2025-03-29 [Rank-N类型的简单例子](/posts/2025-03-29-rankn-types/)
 - 2025-03-28 [从Hello World到IO Monad](/posts/2025-03-28-iomonad/)
+- 2025-02-21 [游戏王「烙印」卡组攻略](/posts/2025-02-21-branded/)
 - 2024-09-21 [笨方法写Quine](/posts/2024-09-21-quine/)
 - 2024-08-03 [Emacs手札](/posts/2024-08-03-emacs/)
 - 2024-03-24 [基于Debian 12的IPv4/IPv6双栈软路由](/posts/2024-03-24-router/)
