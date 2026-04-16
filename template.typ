@@ -21,7 +21,7 @@
     )
     #set text(font: (
         "Libertinus Serif",
-        "KingHwa_OldSong",
+        "FZWuYingTiS",
     ))
     #set heading(numbering: "1.")
     #set page(
