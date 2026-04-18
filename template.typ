@@ -30,7 +30,7 @@
     )
     #set page(numbering: "1")
     #counter(page).update(1)
-    #align(center, text(27pt, font: "Source Han Serif", weight: "semibold")[
+    #align(center, text(27pt, font: "Source Han Serif", weight: "medium")[
         *#title*
     ])
     #show heading: set text(font: "Source Han Serif", weight: "semibold")
