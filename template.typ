@@ -30,10 +30,10 @@
     )
     #set page(numbering: "1")
     #counter(page).update(1)
-    #align(center, text(27pt, font: "Source Han Serif")[
+    #align(center, text(27pt, font: "Source Han Serif", weight: "semibold")[
         *#title*
     ])
-    #show heading: set text(font: "Source Han Serif", weight: "medium")
+    #show heading: set text(font: "Source Han Serif", weight: "semibold")
     #align(center, [#par(first-line-indent: 0em)[#date] #v(0.5em)])
     #set par(
         first-line-indent: 2em,
